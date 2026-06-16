@@ -1,0 +1,13 @@
+
+NEW GUIDE: 5/29/2026
+
+bash cmd prompt installation:
+
+
+# Install required packages
+pip install flask
+pip install flask-socketio
+pip install pyserial
+pip install python-engineio
+pip install python-socketio
+pip install eventlet

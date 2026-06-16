@@ -1,0 +1,90 @@
+{
+    "slots": [
+        {
+            "id": 1778562620059,
+            "name": "jejeejeje",
+            "poses": [
+                {
+                    "angles": [
+                        90,
+                        90,
+                        90,
+                        90,
+                        90,
+                        90
+                    ],
+                    "duration": 2.5
+                },
+                {
+                    "angles": [
+                        180,
+                        27,
+                        166,
+                        90,
+                        90,
+                        90
+                    ],
+                    "duration": 2.5
+                },
+                {
+                    "angles": [
+                        180,
+                        152,
+                        166,
+                        90,
+                        90,
+                        90
+                    ],
+                    "duration": 2.5
+                },
+                {
+                    "angles": [
+                        180,
+                        152,
+                        47,
+                        90,
+                        90,
+                        90
+                    ],
+                    "duration": 7.5
+                }
+            ],
+            "repeat": true
+        },
+        {
+            "id": 1778584355024,
+            "name": "SEQ_ALPHA_beta",
+            "poses": [
+                {
+                    "angles": [
+                        180,
+                        152,
+                        47,
+                        90,
+                        90,
+                        90
+                    ],
+                    "duration": 2.1
+                },
+                {
+                    "angles": [
+                        180,
+                        33,
+                        47,
+                        90,
+                        90,
+                        90
+                    ],
+                    "duration": 2.1
+                }
+            ],
+            "repeat": false
+        },
+        {
+            "id": 1778585590906,
+            "name": "SEQ_ALPHA_3",
+            "poses": [],
+            "repeat": false
+        }
+    ]
+}

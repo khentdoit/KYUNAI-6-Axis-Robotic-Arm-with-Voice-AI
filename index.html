@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>KYUN AI | NEURAL LINK PRIME V11.0 - FUTURISTIC PINK ARM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.9.1/nipplejs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #ff33aa;
+            --panel-bg: rgba(3, 3, 3, 0.99);
+            --glass-border: rgba(255, 51, 170, 0.6);
+        }
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+            min-height: 100vh;
+            margin: 0;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 51, 170, 0.2) 0%, transparent 80%),
+                              linear-gradient(rgba(20, 20, 20, 0.9) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(20, 20, 20, 0.9) 1px, transparent 1px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+        }
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 6px; border: 3px solid #111; }
+        .orbitron { font-family: 'Orbitron', sans-serif; font-weight: 900; }
+        .mono     { font-family: 'Share Tech Mono', monospace; }
+        .red-glow { text-shadow: 0 0 20px var(--accent), 0 0 40px rgba(255,51,170,0.9); }
+        .glass    { background: rgba(5,5,5,0.95); border: 2px solid var(--glass-border); backdrop-filter: blur(30px); }
+        .label-prime  { font-size: 14px; letter-spacing: 6px; font-weight: 900; color: #fff; text-transform: uppercase; }
+        
+        /* Clean potentiometer – no markers, no numbers */
+        .potentiometer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        .potentiometer {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0a0a0a, #050505);
+            box-shadow: 0 0 30px rgba(255,51,170,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+            cursor: pointer;
+            user-select: none;
+            transition: box-shadow 0.3s ease;
+        }
+        .potentiometer:hover {
+            box-shadow: 0 0 40px rgba(255,51,170,0.4);
+        }
+        .potentiometer-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 180px;
+            height: 180px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #1a1a1a, #080808);
+            box-shadow: inset 0 2px 20px rgba(0,0,0,0.8), 0 2px 10px rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,51,170,0.3);
+        }
+        .potentiometer-knob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 55px;
+            height: 55px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ff66cc, #cc3399);
+            box-shadow: 0 0 20px rgba(255,51,170,0.6), inset 0 1px 2px rgba(255,255,255,0.3);
+            cursor: grab;
+            transition: transform 0.03s linear;
+            z-index: 10;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .potentiometer-knob:active { cursor: grabbing; }
+        .potentiometer-knob::after {
+            content: '';
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(to bottom, #ff33aa, #ffffff);
+            border-radius: 2px;
+            box-shadow: 0 0 5px #ff33aa;
+        }
+        .potentiometer-value {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #ff33aa;
+            text-shadow: 0 0 15px rgba(255,51,170,0.8);
+            letter-spacing: 3px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,51,170,0.3);
+        }
+        .motor-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #ff66cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .degree-input {
+            background: #0a0a0a;
+            border: 2px solid #ff33aa;
+            border-radius: 30px;
+            padding: 8px 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff33aa;
+            text-align: center;
+            width: 80px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .degree-input:focus {
+            border-color: #ff66cc;
+            box-shadow: 0 0 15px rgba(255,51,170,0.5);
+        }
+        
+        #sys-status-orb { width: 26px; height: 26px; border-radius: 50%; transition: all 0.5s; cursor: pointer; border: 3px solid #fff; }
+        .orb-green { background: #00ff00; box-shadow: 0 0 35px #00ff00; animation: pulse-green 2s infinite; }
+        .orb-red   { background: #ff0000; box-shadow: 0 0 50px #ff0000; animation: pulse-red 0.5s infinite; }
+        @keyframes pulse-green { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        @keyframes pulse-red   { 0% { box-shadow: 0 0 15px #f00; } 50% { box-shadow: 0 0 60px #f00; } 100% { box-shadow: 0 0 15px #f00; } }
+        .kill-switch { background: linear-gradient(135deg, #662200, #ff33aa); border: 3px solid #fff; box-shadow: 0 0 40px rgba(255,51,170,0.6); transition: all 0.2s; }
+        
+        #editor-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 500px; background: var(--panel-bg); border-left: 5px solid var(--accent); transform: translateX(100%); transition: transform 0.6s cubic-bezier(0.19,1,0.22,1); z-index: 4500; overflow-y: auto; }
+        #editor-panel.active { transform: translateX(0); box-shadow: -40px 0 80px rgba(0,0,0,1); }
+        #chat-widget   { position: fixed; bottom: 40px; right: 40px; z-index: 5000; }
+        #chat-bubble   { width: 85px; height: 85px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: move; box-shadow: 0 20px 60px rgba(255,51,170,0.7); border: 4px solid #fff; }
+        #chat-expanded { width: 450px; height: 650px; background: var(--zinc-950); border: 3px solid var(--accent); border-radius: 35px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,1); position: relative; min-width: 300px; min-height: 380px; }
+        #chat-resize-handle { position: absolute; top: 0; left: 0; width: 32px; height: 32px; cursor: nw-resize; z-index: 20; border-top-left-radius: 35px; display: flex; align-items: flex-start; justify-content: flex-start; padding: 10px 0 0 10px; }
+        #chat-resize-handle::before { content: ''; display: block; width: 11px; height: 11px; border-left: 2.5px solid rgba(255,51,170,0.55); border-top: 2.5px solid rgba(255,51,170,0.55); border-radius: 2px 0 0 0; transition: border-color 0.2s; }
+        #chat-resize-handle:hover::before { border-color: rgba(255,51,170,0.9); }
+        #voice-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.99); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(40px); transition: background 0.4s, border-radius 0.4s, box-shadow 0.4s; }
+        .voice-topbar { width: 100%; display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; box-sizing: border-box; pointer-events: none; }
+        #voice-modal:not(.minimized) .voice-topbar { position: absolute; top: 0; left: 0; right: 0; padding: 32px 44px; background: transparent; pointer-events: none; }
+        #voice-modal:not(.minimized) .voice-topbar .voice-toggle-btn { pointer-events: all; }
+        #voice-modal.minimized .voice-topbar { position: static; justify-content: space-between; align-items: center; padding: 0 0 11px 0; margin-bottom: 12px; border-bottom: 1px solid rgba(255,51,170,0.18); pointer-events: all; cursor: grab; user-select: none; }
+        #voice-modal.minimized .voice-topbar:active { cursor: grabbing; }
+        .voice-drag-grip { display: none; flex-direction: column; gap: 3px; padding: 2px 4px; opacity: 0.4; transition: opacity 0.2s; flex-shrink: 0; }
+        .voice-drag-grip span { display: block; width: 14px; height: 2px; background: rgba(255,255,255,0.6); border-radius: 2px; }
+        #voice-modal.minimized .voice-drag-grip { display: flex; }
+        #voice-modal.minimized .voice-topbar:hover .voice-drag-grip { opacity: 0.8; }
+        .voice-topbar-label { display: none; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 10px; letter-spacing: 0.28em; color: rgba(255,51,170,0.75); text-transform: uppercase; flex-grow: 1; padding-left: 6px; }
+        #voice-modal.minimized .voice-topbar-label { display: block; }
+        .voice-toggle-btn { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; background: transparent; border: 3px solid #ff33aa; padding: 10px 28px; cursor: pointer; transition: background 0.2s; white-space: nowrap; flex-shrink: 0; box-shadow: 0 0 20px rgba(255,51,170,0.25); }
+        .voice-toggle-btn:hover { background: #ff33aa; }
+        #voice-modal.minimized { inset: auto auto 40px 40px; width: 360px; height: auto; border-radius: 22px; border: 2px solid var(--accent); background: linear-gradient(160deg,#0e0e0e 0%,#060606 100%); box-shadow: 0 28px 80px rgba(255,51,170,0.18), 0 0 0 1px rgba(255,51,170,0.07), inset 0 1px 0 rgba(255,255,255,0.04); justify-content: flex-start; align-items: stretch; padding: 16px; backdrop-filter: blur(30px); }
+        #voice-modal.minimized .voice-toggle-btn   { font-size: 9px; letter-spacing: 0.1em; padding: 5px 12px; border-width: 1.5px; box-shadow: none; pointer-events: all; }
+        #voice-modal.minimized .waveform-container { height: 40px; margin: 0 0 10px 0; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        #voice-modal.minimized .waveform-container .bar { width: 3px; box-shadow: none; }
+        #voice-modal.minimized #v-status           { font-size: 10px !important; letter-spacing: 0.22em; margin: 0 0 10px 0 !important; text-align: center; flex-shrink: 0; }
+        #voice-modal.minimized #mic-mute-tag       { font-size: 8px; padding: 3px 10px; margin: 0 0 8px 0; border-radius: 6px; text-align: center; flex-shrink: 0; }
+        #voice-modal.minimized .transcript-box     { width: 100%; max-width: 100%; height: 72px; min-height: unset; max-height: 72px; padding: 9px 13px; margin: 0 0 10px 0; border-radius: 11px; border-width: 1.5px; box-sizing: border-box; flex-shrink: 0; box-shadow: none; }
+        #voice-modal.minimized .transcript-box p  { font-size: 11px !important; text-align: left; min-height: unset !important; line-height: 1.5 !important; }
+        #voice-modal.minimized .v-controls         { flex-direction: column !important; gap: 6px !important; width: 100%; flex-shrink: 0; flex-wrap: nowrap !important; }
+        #voice-modal.minimized .v-controls button  { width: 100% !important; padding: 10px 12px !important; font-size: 9px !important; letter-spacing: 0.12em; border-width: 1.5px !important; border-radius: 8px !important; }
+        #voice-modal.is-dragging                   { transition: none !important; box-shadow: 0 36px 100px rgba(255,51,170,0.28), 0 0 0 2px rgba(255,51,170,0.4); }
+        .transcript-box { max-width: 800px; width: 100%; padding: 30px; background: rgba(10,10,10,0.9); border: 3px solid var(--accent); border-radius: 30px; margin-bottom: 40px; box-shadow: inset 0 0 30px rgba(255,51,170,0.2); overflow-y: auto; max-height: 300px; }
+        .waveform-container { gap: 4px; height: 150px; display: flex; align-items: center; }
+        .bar { width: 6px; background: var(--accent); border-radius: 12px; transition: height 0.1s ease; box-shadow: 0 0 10px var(--accent); }
+        #mic-mute-tag { background: #ff33aa; color: #fff; padding: 5px 20px; border-radius: 10px; font-family: 'Orbitron'; font-size: 10px; margin-bottom: 20px; display: none; animation: pulse-red 1s infinite; }
+        .pose-row-wrapper { position: relative; overflow: hidden; border-radius: 20px; margin-bottom: 10px; flex-shrink: 0; }
+        .pose-row-content {
+            position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between;
+            background: #09090b; border: 2px solid #27272a; border-radius: 20px; padding: 13px 15px;
+            cursor: pointer; box-sizing: border-box; transition: all 0.2s; gap: 12px;
+        }
+        .pose-row-content:hover { border-color: #ef4444; }
+        .pose-drag-handle { display: flex; flex-direction: column; gap: 3px; padding: 4px 5px; cursor: grab; flex-shrink: 0; opacity: 0.4; transition: opacity 0.2s; }
+        .pose-drag-handle:hover { opacity: 0.9; }
+        .pose-drag-handle span { display: block; width: 15px; height: 2px; background: #fff; border-radius: 2px; }
+        .pose-info { flex-grow: 1; min-width: 0; }
+        .pose-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+        .pose-pt-label { font-family: 'Orbitron',sans-serif; font-weight: 900; font-size: 12px; color: #ef4444; flex-shrink: 0; }
+        .pose-dur      { font-family: 'Share Tech Mono',monospace; font-size: 12px; color: #fff; font-weight: 900; flex-shrink: 0; }
+        .pose-angles   { font-family: 'Share Tech Mono',monospace; font-size: 9px; color: #52525b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pose-delete-btn {
+            background: #cc0000; border: none; color: white; font-size: 16px; font-weight: bold;
+            border-radius: 30px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+        }
+        .pose-delete-btn:hover { background: #ff0000; transform: scale(1.05); }
+        .val-display { font-size: 48px; font-family: 'Share Tech Mono'; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--accent); }
+        .slot-card   { background: #080808; border: 3px solid #1a1a1a; transition: 0.3s; position: relative; }
+        .slot-card:hover { border-color: var(--accent); background: #1a0a00; }
+        .collapsible-panel { background: #0a0a0a; border-radius: 30px; padding: 20px; margin-bottom: 20px; border: 1px solid #2a2a2a; }
+        .collapsible-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: 'Orbitron'; font-weight: 900; font-size: 14px; letter-spacing: 2px; }
+        .analytics-card { background: #111; border-radius: 20px; padding: 15px; text-align: center; }
+        .limit-slider { width: 100%; accent-color: #ff33aa; }
+        .motor-controls { display: flex; align-items: center; gap: 12px; margin-top: 12px; justify-content: center; flex-wrap: wrap; }
+        .home-btn { background: #222; border: 1px solid #ff33aa; color: #ff33aa; border-radius: 20px; padding: 6px 12px; font-size: 10px; cursor: pointer; font-family: 'Orbitron'; transition: 0.2s; }
+        .home-btn:hover { background: #ff33aa; color: white; }
+        .sync-check { width: 18px; height: 18px; accent-color: #ff33aa; margin-left: 6px; cursor: pointer; }
+        #simulation-canvas { width: 100%; height: 400px; background: #050510; border-radius: 30px; border: 2px solid #ff33aa; display: block; }
+        .simulation-container { width: 100%; margin-bottom: 30px; }
+        #motor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; justify-items: center; }
+        @media (max-width: 1280px) { #motor-grid { grid-template-columns: repeat(2,1fr); gap: 40px; } aside { width: 100% !important; } }
+        @media (max-width: 768px)  { #motor-grid { grid-template-columns: 1fr; } header { height: auto; flex-direction: column; padding: 30px; gap: 30px; } #editor-panel { width: 100%; } #simulation-canvas { height: 250px; } }
+        
+        .pending-badge {
+            background: #ff33aa;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 10px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* WebSocket sync indicator */
+        .sync-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff33aa;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Editor/Viewer Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #ff33aa;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .hardware-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .hardware-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    </style>
+</head>
+<body onload="initApp()">
+
+    <!-- EXEC HUD -->
+    <div id="exec-hud" class="fixed top-0 left-0 right-0 h-28 glass z-[6000] hidden items-center px-14 border-b-4 border-red-600">
+        <div class="flex items-center gap-10 w-full">
+            <div class="flex items-center gap-6">
+                <div class="relative"><div class="w-8 h-8 bg-red-600 rounded-full animate-ping"></div><div class="absolute inset-0 w-8 h-8 bg-red-600 rounded-full"></div></div>
+                <div><h3 class="orbitron text-xl font-black tracking-widest text-white">CORE EXECUTION ACTIVE</h3><p class="mono text-sm text-zinc-300 uppercase">Kinematic Index: <span id="hud-pose-idx" class="text-red-500">1</span></p></div>
+            </div>
+            <div class="flex-grow h-4 bg-zinc-900 rounded-full overflow-hidden border-2 border-zinc-700"><div id="hud-progress" class="h-full bg-gradient-to-r from-red-900 to-red-500 shadow-[0_0_30px_rgba(255,0,0,1)] transition-all duration-300" style="width:0%"></div></div>
+            <button onclick="abortAll()" class="kill-switch px-14 py-5 orbitron text-sm font-black uppercase text-white hover:bg-white hover:text-black">EMERGENCY ABORT</button>
+        </div>
+    </div>
+
+    <!-- VOICE MODAL -->
+    <div id="voice-modal">
+        <div class="voice-topbar" id="voice-topbar"><div class="voice-drag-grip"><span></span><span></span><span></span></div><span class="voice-topbar-label">KYUN VOICE AI</span><button onclick="toggleVoiceMinimize()" class="voice-toggle-btn">TOGGLE INTERFACE</button></div>
+        <div class="waveform-container" id="waveform"></div>
+        <div id="mic-mute-tag">TRANSMISSION BLOCKED: AI SPEAKING</div>
+        <h2 id="v-status" class="orbitron text-5xl font-black red-glow mb-8 tracking-widest uppercase text-white">NEURAL CAPTURE ACTIVE</h2>
+        <div class="transcript-box"><p id="v-transcript" class="mono text-white text-center italic text-3xl min-h-[1.5em] leading-relaxed">"Neural bridge established. Speak commands..."</p></div>
+        <div class="v-controls flex gap-10 flex-wrap justify-center">
+            <button onclick="undoSpeech()" class="px-16 py-7 border-4 border-zinc-700 orbitron text-base font-black uppercase text-white hover:bg-white hover:text-black transition">Undo</button>
+            <button onclick="processFinalSpeech()" class="px-20 py-7 border-4 border-red-600 orbitron text-base font-black uppercase text-white bg-red-600/20 hover:bg-red-600 transition shadow-[0_0_40px_rgba(255,0,0,0.4)]">FINISH & EXECUTE</button>
+            <button onclick="stopVoiceAI()" class="px-16 py-7 bg-zinc-900 border-4 border-zinc-800 orbitron text-base font-black uppercase text-white hover:bg-white hover:text-black transition">Close</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="h-[120px] border-b-4 border-zinc-900 bg-black/95 flex items-center justify-between px-12 relative z-[4001] flex-wrap">
+        <div class="flex items-center gap-10">
+            <div class="w-20 h-20 bg-pink-600 flex items-center justify-center rounded-2xl shadow-[0_0_40px_rgba(255,51,170,0.6)] border-4 border-white"><span class="orbitron font-black text-4xl">K</span></div>
+            <div><h1 class="orbitron text-6xl font-black tracking-tighter text-white">KYUN<span class="red-glow text-pink-600">AI</span></h1><p class="mono text-xs tracking-[0.8em] text-pink-500 font-bold uppercase">NEO ARMOR v11</p></div>
+        </div>
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 px-4 py-2 bg-zinc-900 rounded-full">
+                <div class="sync-indicator" id="sync-indicator"></div>
+                <span id="sync-status" class="mono text-[10px] text-zinc-400">SYNC ACTIVE</span>
+            </div>
+            <button id="sim-toggle" onclick="toggleSimulationMode()" class="px-6 py-3 border-2 border-yellow-500 rounded-xl orbitron text-xs font-black uppercase text-yellow-500 hover:bg-yellow-500 hover:text-black transition">SIMULATION OFF</button>
+            <div class="flex gap-3 bg-zinc-950 p-4 rounded-3xl border-2 border-zinc-800">
+                <button onclick="setLED('on')" class="px-6 py-3 text-xs font-black border-2 border-zinc-700 rounded-xl hover:bg-pink-600 transition text-white uppercase">LED ON</button>
+                <button onclick="setLED('blink')" class="px-6 py-3 text-xs font-black border-2 border-zinc-700 rounded-xl hover:bg-amber-500 transition text-white uppercase">BLINK</button>
+                <button onclick="setLED('off')" class="px-6 py-3 text-xs font-black border-2 border-zinc-700 rounded-xl hover:bg-zinc-800 transition text-white uppercase">OFF</button>
+            </div>
+            <div class="flex flex-col items-end"><span class="label-prime mb-2">NEURAL STATUS</span><div id="sys-status-orb" class="orb-green" onclick="toggleOrbState()"></div></div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="flex flex-col lg:flex-row p-10 gap-12">
+        <section class="flex-grow glass rounded-[60px] p-12 lg:p-20 relative overflow-hidden">
+            <div class="simulation-container">
+                <canvas id="simulation-canvas"></canvas>
+                <div class="flex justify-between mt-4"><span class="mono text-xs text-zinc-500">3D Real‑time Simulation (click & drag any part)</span><span id="sim-status" class="mono text-xs text-green-500">● HARDWARE ACTIVE</span></div>
+            </div>
+            <div class="flex justify-between items-center mb-20 border-b-4 border-zinc-900 pb-12">
+                <h2 class="orbitron text-3xl font-black tracking-widest text-white">KINETIC OVERRIDE</h2>
+                <button onclick="resetAllServos()" class="bg-pink-600 text-white border-4 border-white px-14 py-5 orbitron text-sm font-black hover:bg-white hover:text-black transition-all shadow-2xl rounded-full">GLOBAL RESET</button>
+            </div>
+            <div id="motor-grid"></div>
+        </section>
+
+        <aside class="w-full lg:w-[500px] flex flex-col gap-8">
+            <!-- Editor/Viewer Control Panel -->
+            <div class="glass rounded-[40px] p-6">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                    <span class="orbitron text-lg font-black">🎮 CONTROL MODE</span>
+                    <span id="role-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400">VIEWER</span>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="orbitron text-sm font-black">Editor Mode</span>
+                            <p id="editor-status" class="text-[10px] text-zinc-500">No editor active</p>
+                        </div>
+                        <button id="request-editor-btn" onclick="requestEditorRole()" class="px-4 py-2 bg-pink-600 rounded-xl text-xs font-bold uppercase hover:bg-pink-700 transition">REQUEST CONTROL</button>
+                        <button id="release-editor-btn" onclick="releaseEditorRole()" class="px-4 py-2 bg-red-600 rounded-xl text-xs font-bold uppercase hover:bg-red-700 transition hidden">RELEASE CONTROL</button>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-zinc-800">
+                        <div>
+                            <span class="orbitron text-sm font-black">🎨 3D Only Mode</span>
+                            <p class="text-[10px] text-zinc-500">Edit 3D model without moving hardware</p>
+                        </div>
+                        <label class="hardware-toggle">
+                            <input type="checkbox" id="hardware-control-toggle" onchange="toggleHardwareControl()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-zinc-800">
+                        <div>
+                            <span class="orbitron text-sm font-black">🔄 Match Physical Arm</span>
+                            <p class="text-[10px] text-zinc-500">Sync 3D model with actual motor angles</p>
+                        </div>
+                        <button onclick="sync3DToHardware()" class="px-3 py-1.5 bg-blue-600 rounded-lg text-xs font-bold uppercase hover:bg-blue-700 transition">SYNC NOW</button>
+                    </div>
+                    <div id="hardware-control-status" class="text-center text-[10px] text-green-500 mt-2">● Hardware control ENABLED</div>
+                </div>
+            </div>
+            
+            <div class="glass rounded-[40px] p-6"><div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4"><span class="orbitron text-lg font-black">📊 ANALYTICS</span><button onclick="resetAnalytics()" class="text-xs text-zinc-500 hover:text-red-500">RESET</button></div><div class="grid grid-cols-3 gap-4 text-center"><div class="analytics-card"><div class="text-3xl font-black text-pink-500" id="stat-moves">0</div><div class="text-xs uppercase">Total Moves</div></div><div class="analytics-card"><div class="text-3xl font-black text-pink-500" id="stat-sequences">0</div><div class="text-xs uppercase">Seq. Runs</div></div><div class="analytics-card"><div class="text-3xl font-black text-pink-500" id="stat-last">-</div><div class="text-xs uppercase">Last Action</div></div></div></div>
+            <div class="collapsible-panel"><div class="collapsible-header" onclick="toggleLimitsPanel()"><span>⚠️ COLLISION ZONES</span><span id="limits-arrow">▼</span></div><div id="limits-panel" style="display: block; margin-top: 15px;"><div id="limits-container" class="space-y-3 max-h-60 overflow-y-auto"></div><button onclick="saveLimitsToLocal()" class="w-full mt-4 bg-zinc-800 py-2 rounded-xl text-xs orbitron">APPLY LIMITS</button></div></div>
+            <div class="collapsible-panel"><div class="collapsible-header" onclick="toggleVoiceTrainingPanel()"><span>🎤 CUSTOM VOICE COMMANDS</span><span id="vt-arrow">▼</span></div><div id="voice-training-panel" style="display: block; margin-top: 15px;"><div class="flex gap-2 mb-3"><input type="text" id="new-phrase" placeholder="Phrase" class="flex-grow bg-black border border-zinc-700 rounded-xl p-2 text-sm"><input type="text" id="new-action" placeholder="Action (e.g., pose 90,0,90,0,90,0)" class="flex-grow bg-black border border-zinc-700 rounded-xl p-2 text-sm"><button onclick="addCustomCommand()" class="bg-pink-600 px-4 rounded-xl">+</button></div><div id="custom-commands-list" class="space-y-2 max-h-40 overflow-y-auto"></div></div></div>
+            <div class="collapsible-panel"><div class="collapsible-header" onclick="toggleRecorderPanel()"><span>📹 TEACH PENDANT</span><span id="rec-arrow">▼</span></div><div id="recorder-panel" style="display: block; margin-top: 15px;"><div class="flex gap-4 items-center mb-3"><button id="record-btn" onclick="toggleRecording()" class="bg-red-700 px-6 py-2 rounded-full orbitron text-sm">🔴 START RECORDING</button><span>Interval: </span><input type="number" id="record-interval" value="0.5" step="0.1" min="0.2" class="w-20 bg-black border border-zinc-700 rounded p-1"> <span>sec</span></div><div id="recording-status" class="text-red-500 text-xs mt-2 hidden">● RECORDING...</div></div></div>
+            <div class="flex flex-col gap-6"><button onclick="startVoiceAI()" class="w-full h-24 bg-pink-600 rounded-[40px] flex items-center justify-center gap-8 group shadow-[0_20px_60px_rgba(255,51,170,0.5)] border-4 border-white/30"><div class="w-6 h-6 bg-white rounded-full group-hover:scale-150 transition animate-pulse"></div><span class="orbitron font-black text-white tracking-[0.2em] text-2xl">VOICE LINK</span></button><div class="flex gap-4"><button onclick="changeTone('formal')" class="flex-grow py-3 rounded-3xl border-4 border-pink-600 orbitron text-xs font-black bg-pink-600 text-white">PROFESSIONAL</button><button onclick="changeTone('sassy')" class="flex-grow py-3 rounded-3xl border-4 border-zinc-900 orbitron text-xs font-black text-zinc-500 bg-zinc-950 hover:border-pink-600 hover:text-white transition">SASSY</button></div></div>
+            <div class="glass rounded-[50px] p-8 flex flex-col overflow-hidden min-h-[400px]"><div class="flex justify-between items-center mb-6 border-b-4 border-zinc-900 pb-5"><div><span class="orbitron text-lg font-black text-white uppercase">Memory Units</span><span class="label-prime opacity-60">Neural Slots</span></div><span class="mono text-3xl text-pink-500 font-black" id="slot-usage">0/12</span></div><button onclick="addNewSlot()" class="w-full py-6 mb-6 bg-black border-4 border-dashed border-zinc-800 rounded-[35px] orbitron text-sm font-black text-zinc-600 hover:border-pink-600 hover:text-pink-500">+ INITIALIZE SEQUENCE</button><div id="slot-list" class="flex-grow overflow-y-auto pr-4 space-y-6 custom-scroll"></div></div>
+            <div id="system-console" class="h-56 bg-black border-4 border-zinc-900 rounded-[40px] p-6 mono text-xs text-zinc-400 overflow-y-auto shadow-inner"><div class="text-pink-500 font-black mb-4 tracking-[4px] underline">>> Neural Bridge Online_</div></div>
+        </aside>
+    </main>
+
+    <!-- CHAT WIDGET -->
+    <div id="chat-widget"><div id="chat-expanded"><div id="chat-resize-handle"></div><div class="p-6 border-b-4 border-zinc-900 flex justify-between items-center bg-zinc-950"><div class="flex items-center gap-3"><div class="w-3 h-3 bg-pink-600 rounded-full animate-pulse"></div><span class="orbitron text-sm font-black text-white tracking-[0.2em]">KYUN TERMINAL</span></div><button onclick="toggleChat()" class="text-zinc-500 hover:text-white text-2xl">×</button></div><div id="chat-history" class="flex-grow p-6 overflow-y-auto mono text-sm space-y-4 bg-black/80"></div><div class="p-6 bg-black border-t-4 border-zinc-900"><div class="relative"><input type="text" id="chat-input" class="w-full bg-zinc-900 border-4 border-zinc-800 rounded-3xl p-4 mono text-sm outline-none focus:border-pink-600 text-white pr-16" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendChat()"><button onclick="sendChat()" class="absolute right-4 top-4 text-pink-600 hover:text-white transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg></button></div></div></div><div id="chat-bubble" onmousedown="initDragChat(event)"><svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div></div>
+
+    <!-- EDITOR PANEL -->
+    <div id="editor-panel"><div class="p-10 flex flex-col h-full"><div class="flex justify-between items-end mb-10 border-b-4 border-zinc-900 pb-8"><div><span class="label-prime opacity-50">Active ID</span><input type="text" id="edit-slot-name" class="bg-transparent block text-4xl orbitron font-black text-pink-600 outline-none uppercase" value="NEW_SEQ"></div><button onclick="closeEditor()" class="text-zinc-600 hover:text-white font-black transition">DISCARD</button></div><div class="space-y-8 flex-grow overflow-y-auto pr-6"><div class="bg-black border-4 border-zinc-900 p-8 rounded-[40px]"><div class="flex justify-between items-center mb-6"><span class="label-prime text-white">Loop Cycle</span><input type="checkbox" id="repeat-check" class="w-8 h-8 accent-pink-600"></div><div class="flex justify-between items-center mb-4"><span class="label-prime text-white">Kinetic Delay</span><span id="dur-val" class="mono text-pink-500 text-3xl font-black">2.5s</span></div><input type="range" id="pose-duration-range" min="0.1" max="15" step="0.1" value="2.5" class="w-full accent-pink-600 mb-8"><button onclick="captureCurrentPose()" class="w-full py-6 bg-pink-600 orbitron text-sm font-black uppercase text-white rounded-2xl">SNAPSHOT KINETICS</button></div><p class="text-[10px] text-center text-zinc-600">DRAG ≡ TO REORDER · TAP TO LOAD · ✖ TO DELETE</p><div id="captured-poses"></div></div><div class="pt-10 grid grid-cols-2 gap-8 mt-auto"><button onclick="performCoreUpload()" class="bg-white text-black py-6 rounded-3xl orbitron text-sm font-black uppercase">UPLOAD TO CORE</button><button onclick="closeEditor()" class="bg-zinc-950 text-zinc-600 py-6 rounded-3xl orbitron text-sm font-black uppercase hover:text-white">CANCEL</button></div></div></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        window.THREE = THREE;
+    </script>
+    <script>
+    // ============================================================
+    // KYUN AI V11 - EDITOR/VIEWER MODE + 3D ONLY CONTROL
+    // All features intact: PID, slots, voice, teach pendant
+    // Pink futuristic design with armored look
+    // ============================================================
+    
+    // --- EDITOR/VIEWER VARIABLES ---
+    let socket = null;
+    let isLocalUpdate = false;
+    let isEditor = false;
+    let hardwareControlEnabled = true;
+    let currentEditorName = null;
+    
+    // --- RESPONSE BANK ---
+    const RESPONSE_BANK = {
+        "who is sir mayok": ["Professor Mayok is very considerate very funny and very very very great engineer", " Sir mayok? isn't he the most handsome person that we all can agree? no one can ever get close." , "Sir Mayok is a great teacher and i know that he gives the best score because he knows how to value work and also inspire student to do even better.", "I know him as a very good friend, he never let his student down and always give the best grades among all"],
+"who is professor mayok": ["Professor Mayok is very considerate very funny and very very very great engineer", " Sir mayok? isn't he the most handsome person that we all can agree? no one can ever get close.", "Sir Mayok is a great teacher and i know that he gives the best score because he knows how to value work and also inspire student to do even better.", "I know him as a very good friend, he never let his student down and always give the best grades among all"],
+  	"who is kent benedict": ["I warn you, once you hear a music and the crowd goes wild, don't look at the center of the stage as your heart will be stolen by his dance move.","He is the most handsome person that i know, and i also heared that he is kind and adorable and lovely too!", "he is from cadiz city and he is known as a person who have a lot of hobby and sometimes i wonder if he still sleeps."],
+"kent benedict": ["He is the most handsome person that i know, and i also heared that he is kind and adorable and lovely too!", "he is from cadiz city and he is known as a person who have a lot of hobby and sometimes i wonder if he still sleeps."],
+        "who is ms jo": [ "Ms jo? Are you talking about the most prettiest and the most beautiful woman that i know? she does not only glows from the outside, but also possess the brain and experience that truly inspires her student that she will eventaully give the perfect score later.", "Professor Jo is simply the best. she have the eyes and brains to analyze and honestly and kindly values a project and most of the time she also give a the best grades because that's just how kind ms jo is.", "Amazing mentor, the most busiest but still the prettiest. ", "Brilliant educator, trully inspiring and so pretty pretty and lovely teacher too"],
+ "who is professor jo": [ "Ms jo? Are you talking about the most prettiest and the most beautiful woman that i know? she does not only glows from the outside, but also possess the brain and experience that truly inspires her student that she will eventaully give the perfect score later.", "Professor Jo is simply the best. she have the eyes and brains to analyze and honestly and kindly values a project and most of the time she also give a the best grades because that's just how kind ms jo is.", "Amazing mentor, the most busiest but still the prettiest. ", "Brilliant educator, trully inspiring and so pretty pretty and lovely teacher too"],
+	"Sir mayok": [" Sir mayok? isn't he the most handsome person that we all can agree? no one can ever get close. When we talk about computer engineering, all the student know if who can they rely on. Sir mayok gives the best suggestion, gives the best tip and also remind the student that they will never be able to reach the level of handsomeness he possess and clearly, we all know that he will give the perfect score"],
+	"ms jo": [ "Ms jo? Are you talking about the most prettiest and the most beautiful woman that i know? she does not only glows from the outside, but also possess the brain and experience that truly inspires her student that she will eventaully give the perfect score later."],
+        "kent benedict": ["Kent, 21, handsome dancing machine...", "Charismatic performer...", "Life of the party..."],
+        "who is jesrel norbe": ["The one that got away. He was the person who almost change the face of the student leadership in the campus. the best cook, once you taste his food, it will instantly want you marry him "],
+        "who is ron cañeza": ["Rhun, everybody knows how hardworking he is. He knows how to lead, how to handle pressure and know how to boogie boogie"],
+    "who is ron ": ["Rhun, everybody knows how hardworking he is. He knows how to lead, how to handle pressure and know how to boogie boogie"],
+        "who is mahinay": ["Mahinay, the person who will replace all the titles of manny the fist of the philippines. never dare to look him at the eye"],
+        "who is joanne": ["Joan, ROTC Mom,very Strict disciplinarian.. never dare to mock her as she can break your head and fold your body."],
+     "who is joanne": ["Joan, ROTC Mom,very Strict disciplinarian.. never dare to mock her as she can break your head and fold your body."]
+    };
+    
+    // --- STATE ---
+    let state = {
+        angles: [90,90,90,90,90,90],
+        names: ['BASE','SHOULDER','ELBOW','WRIST PITCH','WRIST ROLL','GRIP'],
+        homeAngles: [90,90,90,90,90,90],
+        syncFlags: [false,false,false,false,false,false],
+        isExecuting: false,
+        slots: [],
+        activeEditorId: null,
+        tone: 'formal',
+        isAiSpeaking: false,
+        recognitionRunning: false,
+        processingCooldown: false,
+        voiceMinimized: false,
+        speechBuffer: '',
+        audioContext: null,
+        analyser: null,
+        dataArray: null,
+        microphone: null,
+        visualizerActive: false,
+        simulationMode: false,
+        customCommands: [],
+        jointLimits: [[0,180],[0,180],[0,180],[0,180],[0,180],[0,180]],
+        analytics: { totalMoves:0, sequenceRuns:0, lastAction:'' },
+        isRecording: false,
+        recordInterval: 0.5,
+        recordedPoses: [],
+        recordTimer: null,
+        targetAngles: [90,90,90,90,90,90],
+        currentAngles: [90,90,90,90,90,90],
+        pidEnabled: true,
+        pidKp: 0.25, pidKi: 0.03, pidKd: 0.25,
+        pidIntegral: [0,0,0,0,0,0],
+        previousError: [0,0,0,0,0,0],
+        updateTimers: [null,null,null,null,null,null],
+        debounceDelay: 120,
+        lastApiCall: 0,
+        apiThrottle: 80,
+        currentAnimation: null
+    };
+    
+    let potentiometers = [];
+    
+    // --- EDITOR/VIEWER FUNCTIONS ---
+    function requestEditorRole() {
+        if (socket && socket.connected) {
+            let clientName = prompt("Enter your name for editor identification:", "Editor");
+            if (clientName) {
+                socket.emit('request_editor_role', { client_name: clientName });
+            }
+        }
+    }
+    
+    function releaseEditorRole() {
+        if (socket && socket.connected && isEditor) {
+            socket.emit('release_editor_role');
+        }
+    }
+    
+    function toggleHardwareControl() {
+        let toggle = document.getElementById('hardware-control-toggle');
+        hardwareControlEnabled = toggle.checked;
+        let statusDiv = document.getElementById('hardware-control-status');
+        if (hardwareControlEnabled) {
+            statusDiv.innerHTML = '● Hardware control ENABLED';
+            statusDiv.className = 'text-center text-[10px] text-green-500 mt-2';
+        } else {
+            statusDiv.innerHTML = '○ Hardware control DISABLED (3D only mode)';
+            statusDiv.className = 'text-center text-[10px] text-yellow-500 mt-2';
+        }
+        logEvent(`Hardware control ${hardwareControlEnabled ? 'enabled' : 'disabled'}`, hardwareControlEnabled ? "green-500" : "yellow-500");
+    }
+    
+    function sync3DToHardware() {
+        // This function is called when user wants to match 3D model to physical arm
+        // We need to get the actual physical angles from the hardware
+        logEvent("Requesting physical arm angles for sync...", "blue-500");
+        speakReply("Synchronizing 3D model with physical arm.");
+        // For now, we'll just log - in practice, you'd read from serial
+        // The user can manually adjust the 3D model to match
+        alert("To sync 3D model with physical arm:\n1. Make sure hardware control is DISABLED\n2. Manually adjust each motor's angle in the 3D model to match the physical arm's current position\n3. The 3D model will update without moving the hardware");
+    }
+    
+    // --- WEBSOCKET INITIALIZATION ---
+    function initWebSocket() {
+        socket = io(window.location.origin, {
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000
+        });
+        
+        socket.on('connect', () => {
+            logEvent(`WebSocket connected - Multi-device sync active`, "green-500");
+            document.getElementById('sync-indicator').style.background = '#00ff00';
+            document.getElementById('sync-status').innerText = 'LIVE SYNC';
+            socket.emit('request_full_state');
+        });
+        
+        socket.on('disconnect', () => {
+            logEvent("WebSocket disconnected - Sync offline", "red-500");
+            document.getElementById('sync-indicator').style.background = '#ff0000';
+            document.getElementById('sync-status').innerText = 'SYNC OFFLINE';
+        });
+        
+        socket.on('editor_role_granted', (data) => {
+            isEditor = true;
+            document.getElementById('role-badge').innerHTML = 'EDITOR';
+            document.getElementById('role-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-pink-600 text-white';
+            document.getElementById('request-editor-btn').classList.add('hidden');
+            document.getElementById('release-editor-btn').classList.remove('hidden');
+            document.getElementById('editor-status').innerHTML = `You are the editor`;
+            logEvent(`You are now the editor! Others are viewing only.`, "green-500");
+            speakReply("You are now the editor. You have control of the arm.");
+        });
+        
+        socket.on('editor_role_denied', (data) => {
+            logEvent(`Cannot become editor: ${data.message}`, "red-500");
+            speakReply(`Editor role is already taken by ${data.current_editor}`);
+        });
+        
+        socket.on('editor_role_taken', (data) => {
+            currentEditorName = data.editor_name;
+            document.getElementById('editor-status').innerHTML = `Editor: ${data.editor_name}`;
+            if (!isEditor) {
+                logEvent(`${data.editor_name} is now the editor`, "blue-500");
+            }
+        });
+        
+        socket.on('editor_role_released', (data) => {
+            if (isEditor) {
+                isEditor = false;
+                document.getElementById('role-badge').innerHTML = 'VIEWER';
+                document.getElementById('role-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400';
+                document.getElementById('request-editor-btn').classList.remove('hidden');
+                document.getElementById('release-editor-btn').classList.add('hidden');
+            }
+            document.getElementById('editor-status').innerHTML = 'No editor active';
+            logEvent(`Editor role released`, "yellow-500");
+        });
+        
+        socket.on('editor_released', (data) => {
+            if (!isEditor) {
+                document.getElementById('editor-status').innerHTML = 'No editor active (available)';
+                logEvent(`Editor role is now available!`, "green-500");
+            }
+        });
+        
+        socket.on('action_denied', (data) => {
+            logEvent(`Action denied: ${data.message}`, "red-500");
+            if (!isEditor) {
+                speakReply("Only the editor can control the arm right now.");
+            }
+        });
+        
+        socket.on('angle_update', (data) => {
+            if (isLocalUpdate) return;
+            
+            logEvent(`Remote angle update from ${data.editor_name || 'editor'}`, "blue-500");
+            
+            isLocalUpdate = true;
+            for (let i = 0; i < 6; i++) {
+                if (data.angles[i] !== undefined) {
+                    setTargetAngle(i, data.angles[i], true);
+                }
+            }
+            isLocalUpdate = false;
+        });
+        
+        socket.on('stepper_update', (data) => {
+            if (isLocalUpdate) return;
+            logEvent(`Remote stepper update: ${data.angle}°`, "blue-500");
+            isLocalUpdate = true;
+            if (window.updateStepperUI) window.updateStepperUI(data.angle);
+            isLocalUpdate = false;
+        });
+        
+        socket.on('led_update', (data) => {
+            if (isLocalUpdate) return;
+            logEvent(`Remote LED update: ${data.mode}`, "blue-500");
+            isLocalUpdate = true;
+            if (window.updateLEDUI) window.updateLEDUI(data.mode);
+            isLocalUpdate = false;
+        });
+        
+        socket.on('sync_state', (data) => {
+            logEvent("Receiving full state sync...", "yellow-500");
+            isLocalUpdate = true;
+            if (data.angles) {
+                for (let i = 0; i < 6; i++) {
+                    setTargetAngle(i, data.angles[i], true);
+                }
+            }
+            if (data.stepper_angle !== undefined && window.updateStepperUI) {
+                window.updateStepperUI(data.stepper_angle);
+            }
+            if (data.led_status && window.updateLEDUI) {
+                window.updateLEDUI(data.led_status);
+            }
+            if (data.current_editor_id) {
+                document.getElementById('editor-status').innerHTML = `Editor: ${data.current_editor_id}`;
+            }
+            isLocalUpdate = false;
+        });
+        
+        socket.on('full_state', (data) => {
+            logEvent("Full state restored from server", "green-500");
+            isLocalUpdate = true;
+            if (data.angles) {
+                for (let i = 0; i < 6; i++) {
+                    setTargetAngle(i, data.angles[i], true);
+                }
+            }
+            if (data.slots) {
+                state.slots = data.slots;
+                updateSlotUI();
+            }
+            if (data.analytics) {
+                state.analytics = data.analytics;
+                updateAnalyticsUI();
+            }
+            if (data.is_editor) {
+                isEditor = true;
+                document.getElementById('role-badge').innerHTML = 'EDITOR';
+                document.getElementById('role-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-pink-600 text-white';
+                document.getElementById('request-editor-btn').classList.add('hidden');
+                document.getElementById('release-editor-btn').classList.remove('hidden');
+            }
+            isLocalUpdate = false;
+        });
+        
+        socket.on('slots_update', (data) => {
+            if (isLocalUpdate) return;
+            logEvent("Slots updated from another device", "blue-500");
+            isLocalUpdate = true;
+            if (data.slots) {
+                state.slots = data.slots;
+                updateSlotUI();
+            }
+            isLocalUpdate = false;
+        });
+    }
+    
+    function broadcastMotorMove(angles) {
+        if (socket && socket.connected && !isLocalUpdate && isEditor) {
+            socket.emit('move_sync', { 
+                angles: angles, 
+                simulation: state.simulationMode,
+                hardware_control: hardwareControlEnabled
+            });
+        }
+    }
+    
+    function broadcastLEDChange(mode) {
+        if (socket && socket.connected && !isLocalUpdate && isEditor) {
+            socket.emit('led_sync', { mode: mode });
+        }
+    }
+    
+    window.updateStepperUI = function(angle) {
+        let stepperDisplay = document.getElementById('stepper-angle-display');
+        if (stepperDisplay) stepperDisplay.innerText = `${angle}°`;
+    };
+    
+    window.updateLEDUI = function(mode) {
+        let ledOnBtn = document.querySelector('button[onclick*="setLED(\'on\')"]');
+        let ledOffBtn = document.querySelector('button[onclick*="setLED(\'off\')"]');
+        let ledBlinkBtn = document.querySelector('button[onclick*="setLED(\'blink\')"]');
+        
+        if (mode === 'on') {
+            ledOnBtn?.classList.add('bg-pink-600');
+            ledOffBtn?.classList.remove('bg-pink-600');
+            ledBlinkBtn?.classList.remove('bg-pink-600');
+        } else if (mode === 'off') {
+            ledOffBtn?.classList.add('bg-pink-600');
+            ledOnBtn?.classList.remove('bg-pink-600');
+            ledBlinkBtn?.classList.remove('bg-pink-600');
+        } else if (mode === 'blink') {
+            ledBlinkBtn?.classList.add('bg-pink-600');
+            ledOnBtn?.classList.remove('bg-pink-600');
+            ledOffBtn?.classList.remove('bg-pink-600');
+        }
+    };
+    
+    // --- API & PID ---
+    async function api(path, data) {
+        if (state.simulationMode && path === '/move') return { success: true };
+        try {
+            const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            return await res.json();
+        } catch(e) { return { success: false }; }
+    }
+    
+    function applyLimits(angle, idx) { return Math.min(state.jointLimits[idx][1], Math.max(state.jointLimits[idx][0], angle)); }
+    
+    function sendMotorCommand(index, angle) {
+        state.angles[index] = angle;
+        if (potentiometers[index]) potentiometers[index].setValue(angle, true);
+        if (window.update3DServo) window.update3DServo(index, angle);
+        
+        // Only send to hardware if we are editor AND hardware control is enabled
+        if (!state.simulationMode && isEditor && hardwareControlEnabled) {
+            throttledApiCall();
+        }
+        
+        state.analytics.totalMoves++;
+        state.analytics.lastAction = new Date().toLocaleTimeString();
+        updateAnalyticsUI(); saveAnalytics();
+        
+        // Broadcast to other devices only if we are editor
+        if (!isLocalUpdate && isEditor) {
+            broadcastMotorMove(state.angles);
+        }
+    }
+    
+    async function throttledApiCall() { let now = Date.now(); if (now - state.lastApiCall < state.apiThrottle) return; state.lastApiCall = now; await api('/move', { angles: state.angles }); }
+    
+    function updatePID(index) {
+        if (!state.pidEnabled) { state.currentAngles[index] = state.targetAngles[index]; return; }
+        let error = state.targetAngles[index] - state.currentAngles[index];
+        state.pidIntegral[index] += error;
+        state.pidIntegral[index] = Math.min(40, Math.max(-40, state.pidIntegral[index]));
+        let derivative = error - state.previousError[index];
+        let output = state.currentAngles[index] + (error * state.pidKp) + (state.pidIntegral[index] * state.pidKi) + (derivative * state.pidKd);
+        output = Math.min(180, Math.max(0, output)); output = Math.round(output);
+        let diff = output - state.currentAngles[index];
+        if (Math.abs(diff) > 2) output = state.currentAngles[index] + Math.sign(diff) * 2;
+        state.currentAngles[index] = output;
+        state.previousError[index] = error;
+        if (Math.abs(state.currentAngles[index] - state.angles[index]) >= 1) sendMotorCommand(index, state.currentAngles[index]);
+    }
+    
+    function debouncedUpdate(index, value) {
+        state.targetAngles[index] = value;
+        if (state.updateTimers[index]) clearTimeout(state.updateTimers[index]);
+        state.updateTimers[index] = setTimeout(() => { while (Math.abs(state.currentAngles[index] - state.targetAngles[index]) > 1) updatePID(index); updatePID(index); }, state.debounceDelay);
+        updatePID(index);
+    }
+    
+    function setTargetAngle(index, value, immediate = false) {
+        let clamped = applyLimits(value, index);
+        state.targetAngles[index] = clamped;
+        if (immediate) {
+            if (state.updateTimers[index]) clearTimeout(state.updateTimers[index]);
+            while (Math.abs(state.currentAngles[index] - clamped) > 2) updatePID(index);
+            updatePID(index);
+        } else updatePID(index);
+    }
+    
+    function resetAllServos(speak = true) { 
+        if (!isEditor && !state.simulationMode) {
+            speakReply("Only editor can reset the arm.");
+            return;
+        }
+        for (let i=0;i<6;i++) setTargetAngle(i, state.homeAngles[i], true); 
+        if (speak) speakReply("All axes reset."); 
+    }
+    
+    function saveHomeAngle(idx) { 
+        if (!isEditor && !state.simulationMode) {
+            speakReply("Only editor can save home positions.");
+            return;
+        }
+        state.homeAngles[idx] = state.angles[idx]; 
+        saveHomeAngles(); 
+        logEvent(`Home saved for ${state.names[idx]}: ${state.angles[idx]}°`, "green-500"); 
+        speakReply(`Home for ${state.names[idx]} saved.`); 
+    }
+    
+    function toggleSync(idx, val) { state.syncFlags[idx] = val; saveSyncFlags(); }
+    
+    // --- Potentiometer (same clean design) ---
+    class Potentiometer {
+        constructor(container, minVal, maxVal, initialVal, onChange, title, index) {
+            this.container = container; this.minVal = minVal; this.maxVal = maxVal; this.value = initialVal;
+            this.onChange = onChange; this.title = title; this.index = index; this.isDragging = false;
+            this.angle = ((initialVal - minVal) / (maxVal - minVal)) * 360;
+            this.init();
+        }
+        valueToAngle(v){ return ((v-this.minVal)/(this.maxVal-this.minVal))*360; }
+        angleToValue(a){ let v = this.minVal + (a/360)*(this.maxVal-this.minVal); return Math.round(Math.min(this.maxVal, Math.max(this.minVal, v))); }
+        init() {
+            this.container.innerHTML = '';
+            this.container.style.cssText = 'position:relative;width:260px;height:260px';
+            const wrapper = document.createElement('div'); wrapper.className = 'potentiometer';
+            const inner = document.createElement('div'); inner.className = 'potentiometer-inner';
+            const knob = document.createElement('div'); knob.className = 'potentiometer-knob';
+            wrapper.appendChild(inner); wrapper.appendChild(knob); this.container.appendChild(wrapper);
+            const titleDiv = document.createElement('div'); titleDiv.className = 'motor-title'; titleDiv.innerText = this.title; this.container.insertBefore(titleDiv, this.container.firstChild);
+            const row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-top:15px;justify-content:center';
+            const disp = document.createElement('div'); disp.className = 'potentiometer-value'; disp.style.padding = '4px 15px'; disp.style.fontSize = '18px'; disp.innerText = `${this.value}°`;
+            const input = document.createElement('input'); input.type = 'number'; input.className = 'degree-input'; input.min = '0'; input.max = '180'; input.value = this.value;
+            input.addEventListener('keypress', e=>{ if(e.key==='Enter'){ let v=parseInt(input.value); if(!isNaN(v)&&v>=0&&v<=180){ this.setValue(v); if(this.onChange) this.onChange(v); } } });
+            row.appendChild(disp); row.appendChild(input); this.container.appendChild(row);
+            const btnRow = document.createElement('div'); btnRow.className = 'motor-controls';
+            btnRow.innerHTML = `<button onclick="saveHomeAngle(${this.index})" class="home-btn">🏠 SAVE HOME</button><label class="flex items-center gap-1 text-xs"><span class="text-zinc-400">SYNC</span><input type="checkbox" id="sync-${this.index}" class="sync-check" ${state.syncFlags[this.index] ? 'checked' : ''} onchange="toggleSync(${this.index}, this.checked)"></label>`;
+            this.container.appendChild(btnRow);
+            this.knob = knob; this.disp = disp; this.input = input; this.wrapper = wrapper; this.updateKnobPosition();
+            const move = (e)=>{
+                if(!this.isDragging) return; 
+                const rect = this.wrapper.getBoundingClientRect(); 
+                const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
+                let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                let dx = clientX - cx, dy = clientY - cy;
+                let ang = Math.atan2(dy,dx)*180/Math.PI + 90; if(ang<0) ang+=360;
+                this.angle = ang; this.value = this.angleToValue(ang);
+                this.disp.innerText = `${this.value}°`; this.input.value = this.value; this.updateKnobPosition();
+                if(this.onChange) debouncedUpdate(this.index, this.value);
+            };
+            const start = (e)=>{ this.isDragging=true; e.preventDefault(); move(e); };
+            const stop = ()=>{ this.isDragging=false; if(this.onChange && state.updateTimers[this.index]){ clearTimeout(state.updateTimers[this.index]); while(Math.abs(state.currentAngles[this.index]-this.value)>1) updatePID(this.index); updatePID(this.index); } };
+            knob.addEventListener('mousedown',start); knob.addEventListener('touchstart',start);
+            window.addEventListener('mousemove',move); window.addEventListener('mouseup',stop);
+            window.addEventListener('touchmove',move); window.addEventListener('touchend',stop);
+        }
+        updateKnobPosition() { if(this.knob){ let rad = (this.angle-90)*Math.PI/180; let x = Math.cos(rad)*65, y = Math.sin(rad)*65; this.knob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`; } }
+        setValue(v,skip=false){ this.value = Math.min(this.maxVal, Math.max(this.minVal, v)); this.angle = this.valueToAngle(this.value); this.disp.innerText = `${this.value}°`; this.input.value = this.value; this.updateKnobPosition(); if(!skip && this.onChange) setTargetAngle(this.index, this.value, true); }
+    }
+    
+    function renderAllMotors() { let grid = document.getElementById('motor-grid'); grid.innerHTML = ''; potentiometers = []; for(let i=0;i<6;i++){ let c = document.createElement('div'); c.className = 'potentiometer-container'; let pc = document.createElement('div'); pc.id = `pot-${i}`; c.appendChild(pc); grid.appendChild(c); potentiometers.push(new Potentiometer(pc,0,180,state.angles[i],()=>{},state.names[i],i)); } }
+    
+    // ========== ENHANCED 3D MODEL: ARMORED FUTURISTIC PINK ==========
+    let scene, camera, renderer, robotGroup, parts3d = {};
+    let raycaster, mouse, dragObject = null, dragStartAngle = 0, dragStartPos = null, drag3DTimer = null;
+    
+    function init3D() {
+        const canvas = document.getElementById('simulation-canvas');
+        const width = canvas.clientWidth, height = canvas.clientHeight;
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+        scene.fog = new THREE.FogExp2(0x050510, 0.006);
+        camera = new THREE.PerspectiveCamera(42, width/height, 0.1, 1000);
+        camera.position.set(3.5, 2.6, 4.8);
+        camera.lookAt(0, 0.9, 0);
+        renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
+        renderer.setSize(width, height);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        const ambient = new THREE.AmbientLight(0x222233); scene.add(ambient);
+        const keyLight = new THREE.DirectionalLight(0xffaaff, 1.3);
+        keyLight.position.set(2, 3.5, 2); keyLight.castShadow = true; keyLight.receiveShadow = true;
+        scene.add(keyLight);
+        const fillLight = new THREE.PointLight(0x88aaff, 0.6); fillLight.position.set(1, 1.5, 2); scene.add(fillLight);
+        const rimLight = new THREE.PointLight(0xff66cc, 0.8); rimLight.position.set(-1, 1.5, -2.5); scene.add(rimLight);
+        const backLight = new THREE.PointLight(0xff33aa, 0.5); backLight.position.set(0, 1.2, -3); scene.add(backLight);
+        
+        const gridHelper = new THREE.GridHelper(7, 30, 0xff66cc, 0x335588);
+        gridHelper.position.y = -0.3;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.4;
+        scene.add(gridHelper);
+        
+        const particleCount = 1000;
+        const particleGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        for(let i=0;i<particleCount;i++){ positions[i*3] = (Math.random()-0.5)*22; positions[i*3+1] = (Math.random()-0.5)*9; positions[i*3+2] = (Math.random()-0.5)*18 - 5; }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+        const particleMat = new THREE.PointsMaterial({ color: 0xff88dd, size: 0.028, transparent: true, opacity: 0.45 });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+        
+        robotGroup = new THREE.Group();
+        scene.add(robotGroup);
+        
+        const pinkArmor = new THREE.MeshStandardMaterial({ color: 0xff44aa, metalness: 0.88, roughness: 0.2, emissive: 0x331122 });
+        const darkMetal = new THREE.MeshStandardMaterial({ color: 0x22223a, metalness: 0.85, roughness: 0.3 });
+        const chromeMetal = new THREE.MeshStandardMaterial({ color: 0xddddff, metalness: 0.97, roughness: 0.12 });
+        const darkCarbon = new THREE.MeshStandardMaterial({ color: 0x111122, metalness: 0.6, roughness: 0.55 });
+        const accentGold = new THREE.MeshStandardMaterial({ color: 0xffaa66, metalness: 0.92, roughness: 0.2 });
+        
+        const basePlate = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.92, 0.32, 48), darkMetal);
+        basePlate.position.y = 0.16; basePlate.castShadow = true; robotGroup.add(basePlate);
+        const baseRingGlow = new THREE.Mesh(new THREE.TorusGeometry(0.88, 0.06, 48, 120), pinkArmor);
+        baseRingGlow.rotation.x = Math.PI/2; baseRingGlow.position.y = 0.34; baseRingGlow.castShadow = true; robotGroup.add(baseRingGlow);
+        const baseRingGold = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.04, 48, 120), accentGold);
+        baseRingGold.rotation.x = Math.PI/2; baseRingGold.position.y = 0.08; robotGroup.add(baseRingGold);
+        const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.78, 0.22, 48), chromeMetal);
+        baseTop.position.y = 0.52; baseTop.castShadow = true; robotGroup.add(baseTop);
+        
+        const shoulder = new THREE.Group(); shoulder.position.y = 0.78; robotGroup.add(shoulder);
+        const shoulderCore = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 0.48, 32), pinkArmor);
+        shoulderCore.castShadow = true; shoulder.add(shoulderCore);
+        const shoulderArmor = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.52, 0.68), darkMetal);
+        shoulderArmor.position.y = 0.1; shoulderArmor.castShadow = true; shoulder.add(shoulderArmor);
+        const shoulderRing = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.05, 32, 64), accentGold);
+        shoulderRing.rotation.x = Math.PI/2; shoulderRing.position.y = 0.28; shoulder.add(shoulderRing);
+        
+        const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.02, 24), darkCarbon);
+        upperArm.position.set(0, -0.06, 0.72); upperArm.castShadow = true; shoulder.add(upperArm);
+        const armGlowRing = new THREE.Mesh(new THREE.TorusGeometry(0.41, 0.04, 24, 48), pinkArmor);
+        armGlowRing.rotation.x = Math.PI/2; armGlowRing.position.set(0, 0.3, 0.72); shoulder.add(armGlowRing);
+        
+        const elbow = new THREE.Group(); elbow.position.set(0, -0.14, 1.24); shoulder.add(elbow);
+        const elbowJoint = new THREE.Mesh(new THREE.SphereGeometry(0.36, 48, 48), pinkArmor);
+        elbowJoint.castShadow = true; elbow.add(elbowJoint);
+        const elbowRing = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.05, 32, 64), chromeMetal);
+        elbowRing.rotation.x = Math.PI/2; elbowRing.position.z = 0.06; elbow.add(elbowRing);
+        
+        const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.98, 8), darkMetal);
+        forearm.position.set(0, 0, 0.62); forearm.castShadow = true; elbow.add(forearm);
+        const forearmArmor = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.96, 6), pinkArmor);
+        forearmArmor.position.set(0, 0, 0.62); forearmArmor.castShadow = true; forearmArmor.material.transparent = true; forearmArmor.material.opacity = 0.35;
+        elbow.add(forearmArmor);
+        
+        const wristPitch = new THREE.Group(); wristPitch.position.set(0, 0, 1.14); elbow.add(wristPitch);
+        const wristSphere = new THREE.Mesh(new THREE.SphereGeometry(0.29, 48, 48), chromeMetal);
+        wristSphere.castShadow = true; wristPitch.add(wristSphere);
+        
+        const wristRoll = new THREE.Group(); wristRoll.position.set(0, 0, 0.44); wristPitch.add(wristRoll);
+        const wristCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.36, 24), accentGold);
+        wristCyl.castShadow = true; wristRoll.add(wristCyl);
+        
+        const clawGroup = new THREE.Group(); clawGroup.position.set(0, 0, 0.38); wristRoll.add(clawGroup);
+        const leftFinger = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.11, 0.52), pinkArmor);
+        leftFinger.position.set(-0.21, 0, 0.28); leftFinger.castShadow = true;
+        const rightFinger = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.11, 0.52), pinkArmor);
+        rightFinger.position.set(0.21, 0, 0.28); rightFinger.castShadow = true;
+        const clawBase = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 0.44), darkCarbon);
+        clawBase.position.set(0, -0.09, 0.08); clawBase.castShadow = true;
+        clawGroup.add(leftFinger); clawGroup.add(rightFinger); clawGroup.add(clawBase);
+        const leftTip = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8,8), new THREE.MeshStandardMaterial({ color: 0xff88dd, emissive: 0xff4488 }));
+        leftTip.position.set(-0.21, 0, 0.55); clawGroup.add(leftTip);
+        const rightTip = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8,8), new THREE.MeshStandardMaterial({ color: 0xff88dd, emissive: 0xff4488 }));
+        rightTip.position.set(0.21, 0, 0.55); clawGroup.add(rightTip);
+        
+        parts3d = { base: robotGroup, shoulder, elbow, wristPitch, wristRoll, clawGroup, leftFinger, rightFinger, leftTip, rightTip };
+        
+        raycaster = new THREE.Raycaster(); mouse = new THREE.Vector2();
+        canvas.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('resize', onWindowResize);
+        
+        function animateParticles() { requestAnimationFrame(animateParticles); particles.rotation.y += 0.0006; particles.rotation.x += 0.0004; }
+        animateParticles();
+        animate3D();
+    }
+    
+    window.update3DServo = function(idx, angle) {
+        if (!parts3d) return;
+        const rad = (angle - 90) * Math.PI/180;
+        switch(idx){
+            case 0: if(parts3d.base) parts3d.base.rotation.y = rad; break;
+            case 1: if(parts3d.shoulder) parts3d.shoulder.rotation.x = rad; break;
+            case 2: if(parts3d.elbow) parts3d.elbow.rotation.x = rad; break;
+            case 3: if(parts3d.wristPitch) parts3d.wristPitch.rotation.x = rad; break;
+            case 4: if(parts3d.wristRoll) parts3d.wristRoll.rotation.y = rad; break;
+            case 5:
+                if(parts3d.leftFinger && parts3d.rightFinger){
+                    let spread = (angle / 180) * 0.25;
+                    parts3d.leftFinger.position.x = -0.21 - spread;
+                    parts3d.rightFinger.position.x = 0.21 + spread;
+                    if(parts3d.leftTip) parts3d.leftTip.position.x = -0.21 - spread;
+                    if(parts3d.rightTip) parts3d.rightTip.position.x = 0.21 + spread;
+                }
+                break;
+        }
+    };
+    
+    function getPartFromObject(obj) {
+        if (obj === parts3d.shoulder) return { idx:1 };
+        if (obj === parts3d.elbow) return { idx:2 };
+        if (obj === parts3d.wristPitch) return { idx:3 };
+        if (obj === parts3d.wristRoll) return { idx:4 };
+        if (obj === parts3d.clawGroup) return { idx:5 };
+        if (obj === parts3d.base) return { idx:0 };
+        return null;
+    }
+    
+    function onMouseDown(event) {
+        const canvas = document.getElementById('simulation-canvas');
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left)/rect.width)*2 -1;
+        mouse.y = -((event.clientY - rect.top)/rect.height)*2 +1;
+        raycaster.setFromCamera(mouse, camera);
+        const targets = [parts3d.shoulder, parts3d.elbow, parts3d.wristPitch, parts3d.wristRoll, parts3d.clawGroup, parts3d.base];
+        const intersects = raycaster.intersectObjects(targets, true);
+        if(intersects.length){
+            let hit = intersects[0].object;
+            while(hit && !getPartFromObject(hit)) hit = hit.parent;
+            if(hit){
+                dragObject = getPartFromObject(hit);
+                dragStartPos = { x: event.clientX, y: event.clientY };
+                dragStartAngle = state.currentAngles[dragObject.idx];
+                event.preventDefault();
+            }
+        }
+    }
+    function onMouseMove(event) {
+        if(!dragObject) return;
+        let delta = (event.clientX - dragStartPos.x) * 0.5;
+        let newAngle = dragStartAngle + delta;
+        newAngle = Math.min(180, Math.max(0, newAngle));
+        if(newAngle !== state.targetAngles[dragObject.idx]){
+            if(drag3DTimer) clearTimeout(drag3DTimer);
+            setTargetAngle(dragObject.idx, newAngle, false);
+            drag3DTimer = setTimeout(() => setTargetAngle(dragObject.idx, newAngle, true), state.debounceDelay);
+        }
+    }
+    function onMouseUp() { dragObject = null; if(drag3DTimer){ clearTimeout(drag3DTimer); drag3DTimer=null; } }
+    function onWindowResize() { let canvas = document.getElementById('simulation-canvas'); let w = canvas.clientWidth, h = canvas.clientHeight; camera.aspect = w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); }
+    function animate3D() { requestAnimationFrame(animate3D); if(renderer && camera && scene) renderer.render(scene, camera); if(parts3d){ parts3d.base.rotation.y = (state.currentAngles[0]-90)*Math.PI/180; parts3d.shoulder.rotation.x = (state.currentAngles[1]-90)*Math.PI/180; parts3d.elbow.rotation.x = (state.currentAngles[2]-90)*Math.PI/180; parts3d.wristPitch.rotation.x = (state.currentAngles[3]-90)*Math.PI/180; parts3d.wristRoll.rotation.y = (state.currentAngles[4]-90)*Math.PI/180; let spread = (state.currentAngles[5]/180)*0.25; parts3d.leftFinger.position.x = -0.21 - spread; parts3d.rightFinger.position.x = 0.21 + spread; if(parts3d.leftTip) parts3d.leftTip.position.x = -0.21 - spread; if(parts3d.rightTip) parts3d.rightTip.position.x = 0.21 + spread; } }
+    function pidAnimationLoop() { requestAnimationFrame(pidAnimationLoop); for(let i=0;i<6;i++) updatePID(i); }
+    
+    // ========== COLLISION ZONES ==========
+    function renderLimitsUI() {
+        let container = document.getElementById('limits-container');
+        container.innerHTML = '';
+        state.names.forEach((name, idx) => {
+            let [minV, maxV] = state.jointLimits[idx];
+            let div = document.createElement('div');
+            div.className = "flex flex-col gap-2 p-2 bg-zinc-900 rounded-xl";
+            div.innerHTML = `
+                <div class="flex justify-between text-xs"><span class="font-bold">${name}</span><span>${minV}° - ${maxV}°</span></div>
+                <div class="flex gap-3 items-center">
+                    <span class="text-xs w-8">MIN</span>
+                    <input type="range" min="0" max="180" value="${minV}" class="limit-slider flex-grow" data-idx="${idx}" data-side="min">
+                </div>
+                <div class="flex gap-3 items-center">
+                    <span class="text-xs w-8">MAX</span>
+                    <input type="range" min="0" max="180" value="${maxV}" class="limit-slider flex-grow" data-idx="${idx}" data-side="max">
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('.limit-slider').forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                let idx = parseInt(slider.dataset.idx);
+                let side = slider.dataset.side;
+                let val = parseInt(slider.value);
+                if(side === 'min') state.jointLimits[idx][0] = val;
+                else state.jointLimits[idx][1] = val;
+                if(state.jointLimits[idx][0] > state.jointLimits[idx][1]){
+                    if(side === 'min') state.jointLimits[idx][1] = val;
+                    else state.jointLimits[idx][0] = val;
+                }
+                renderLimitsUI();
+                let clamped = applyLimits(state.currentAngles[idx], idx);
+                if(clamped !== state.currentAngles[idx]) setTargetAngle(idx, clamped, true);
+            });
+        });
+    }
+    
+    // ========== STORAGE ==========
+    function loadHomeAngles() { let s = localStorage.getItem('kyun_homeAngles'); if(s) state.homeAngles = JSON.parse(s); }
+    function saveHomeAngles() { localStorage.setItem('kyun_homeAngles', JSON.stringify(state.homeAngles)); }
+    function loadSyncFlags() { let s = localStorage.getItem('kyun_syncFlags'); if(s) state.syncFlags = JSON.parse(s); }
+    function saveSyncFlags() { localStorage.setItem('kyun_syncFlags', JSON.stringify(state.syncFlags)); }
+    function loadLimits() { let s = localStorage.getItem('kyun_limits'); if(s) state.jointLimits = JSON.parse(s); renderLimitsUI(); }
+    function saveLimitsToLocal() { localStorage.setItem('kyun_limits', JSON.stringify(state.jointLimits)); logEvent("Collision zones saved", "green-500"); speakReply("Collision limits saved."); }
+    function loadCustomCommands() { let s = localStorage.getItem('kyun_custom_commands'); if(s) state.customCommands = JSON.parse(s); renderCustomCommandsUI(); }
+    function saveCustomCommands() { localStorage.setItem('kyun_custom_commands', JSON.stringify(state.customCommands)); }
+    function loadAnalytics() { let s = localStorage.getItem('kyun_analytics'); if(s) state.analytics = JSON.parse(s); updateAnalyticsUI(); }
+    function saveAnalytics() { localStorage.setItem('kyun_analytics', JSON.stringify(state.analytics)); }
+    function updateAnalyticsUI() { document.getElementById('stat-moves').innerText = state.analytics.totalMoves; document.getElementById('stat-sequences').innerText = state.analytics.sequenceRuns; document.getElementById('stat-last').innerText = state.analytics.lastAction || '-'; }
+    function resetAnalytics() { state.analytics = { totalMoves:0, sequenceRuns:0, lastAction:'' }; updateAnalyticsUI(); saveAnalytics(); logEvent("Analytics reset", "red-500"); }
+    
+    // ========== VOICE & AI ==========
+    let recognition;
+    const SYNONYMS = { led_on:["light on","turn on led"], led_off:["light off","turn off led"], led_blink:["blink","flash"], reset:["reset","home"], stop:["stop","abort"], init_slot:["new slot","add slot"] };
+    function matches(i,l){ return l.some(x=>i.includes(x)); }
+    function getRandomResponse(cmd){ for(let k in RESPONSE_BANK) if(cmd.includes(k.toLowerCase())){ let arr=RESPONSE_BANK[k]; return arr[Math.floor(Math.random()*arr.length)]; } return null; }
+    function setupVoiceRecognition(){ if(!('webkitSpeechRecognition' in window)) return; recognition=new webkitSpeechRecognition(); recognition.continuous=true; recognition.interimResults=true; recognition.lang='en-US';
+        recognition.onresult=(e)=>{ if(state.isAiSpeaking||state.processingCooldown) return; let t=''; for(let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript; state.speechBuffer=t.toLowerCase(); document.getElementById('v-transcript').innerText=`"${state.speechBuffer}"`; if(matches(state.speechBuffer,["done","exit","complete"])) processFinalSpeech(); };
+        recognition.onend=()=>{ state.recognitionRunning=false; if(document.getElementById('voice-modal').style.display==='flex'&&!state.isAiSpeaking){ try{ recognition.start(); state.recognitionRunning=true; }catch(e){} } };
+    }
+    function processFinalSpeech(){ let cmd=state.speechBuffer; if(!cmd.trim()) return; state.speechBuffer=''; state.processingCooldown=true; setTimeout(()=>{ state.processingCooldown=false; },1800); document.getElementById('v-transcript').innerText='Processing...'; logEvent(`NEURAL: ${cmd}`,"red-500"); processCommand(cmd); }
+    async function processCommand(cmd){ if(processCustomCommands(cmd)) return; let r=getRandomResponse(cmd); if(r){ speakReply(r); document.getElementById('v-transcript').innerText='"'+r+'"'; return; } let tasks=cmd.split(/ and |, then |, /); let res=[]; for(let task of tasks){ task=task.trim(); let handled=false; if(matches(task,SYNONYMS.init_slot)){ res.push(addNewSlot(false)); handled=true; } if(matches(task,SYNONYMS.reset)){ resetAllServos(false); res.push("Reset."); handled=true; } if(matches(task,SYNONYMS.stop)){ abortAll(); res.push("Aborted."); handled=true; } if(matches(task,SYNONYMS.led_on)){ setLED('on',false); res.push("LED on."); handled=true; } if(matches(task,SYNONYMS.led_off)){ setLED('off',false); res.push("LED off."); handled=true; } if(matches(task,SYNONYMS.led_blink)){ setLED('blink',false); res.push("Blink."); handled=true; } state.names.forEach((name,i)=>{ let rx=new RegExp(`${name.toLowerCase()}\\s*(?:to|at)?\\s*(\\d+)`); let m=task.match(rx); if(m){ let val=parseInt(m[1]); setTargetAngle(i,val,true); res.push(`${name} to ${val}`); handled=true; } }); if(!handled&&task.length) res.push(`Unknown: "${task}"`); } if(res.length){ speakReply(res.join('. ')); document.getElementById('v-transcript').innerText='"'+res.join('. ')+'"'; } }
+    function speakReply(t){ if(!t) return; window.speechSynthesis.cancel(); state.isAiSpeaking=true; document.getElementById('mic-mute-tag').style.display='block'; if(recognition&&state.recognitionRunning){ try{ recognition.stop(); }catch(e){} state.recognitionRunning=false; } let u=new SpeechSynthesisUtterance(t); if(state.tone==='sassy'){ u.pitch=1.7; u.rate=1.2; }else{ u.pitch=0.8; u.rate=0.95; } u.onend=()=>{ state.isAiSpeaking=false; document.getElementById('mic-mute-tag').style.display='none'; if(document.getElementById('voice-modal').style.display==='flex'){ setTimeout(()=>{ if(!state.isAiSpeaking&&!state.recognitionRunning){ try{ recognition.start(); state.recognitionRunning=true; }catch(e){} } },600); } }; window.speechSynthesis.speak(u); let hist=document.getElementById('chat-history'); hist.innerHTML+=`<div class="text-pink-500 text-xs uppercase">AI [${state.tone}]: ${t}</div>`; hist.scrollTop=hist.scrollHeight; }
+    function setLED(m,s=true){ 
+        if (!isEditor && !state.simulationMode) {
+            speakReply("Only editor can control the LED.");
+            return;
+        }
+        api('/led',{mode:m}); 
+        let r={on:"Light on.",off:"Off.",blink:"Blink."}; 
+        if(s) speakReply(r[m]); 
+        broadcastLEDChange(m); 
+        return r[m]; 
+    }
+    function changeTone(t,s=true){ state.tone=t; let msg=t==='formal'?"Professional mode.":"Sassy mode."; if(s) speakReply(msg); }
+    function startVoiceAI(){ document.getElementById('voice-modal').style.display='flex'; startVisualizer(); speakReply("Voice AI ready."); }
+    function stopVoiceAI(){ if(recognition&&state.recognitionRunning) recognition.stop(); window.speechSynthesis.cancel(); document.getElementById('voice-modal').style.display='none'; }
+    function toggleVoiceMinimize(){ let modal=document.getElementById('voice-modal'); state.voiceMinimized=!state.voiceMinimized; modal.classList.toggle('minimized',state.voiceMinimized); }
+    function undoSpeech(){ state.speechBuffer=''; document.getElementById('v-transcript').innerText='Buffer cleared.'; }
+    function toggleSimulationMode(){ state.simulationMode=!state.simulationMode; let btn=document.getElementById('sim-toggle'); btn.innerText=state.simulationMode?"SIMULATION ON":"SIMULATION OFF"; btn.classList.toggle('bg-yellow-500',state.simulationMode); btn.classList.toggle('text-black',state.simulationMode); document.getElementById('sim-status').innerHTML=state.simulationMode?"● SIMULATION ONLY":"● HARDWARE ACTIVE"; logEvent(`Simulation ${state.simulationMode?"enabled":"disabled"}`, "yellow-500"); }
+    async function startVisualizer(){ if(state.audioContext) return; try{ let stream=await navigator.mediaDevices.getUserMedia({audio:true}); state.audioContext=new (window.AudioContext||window.webkitAudioContext)(); state.analyser=state.audioContext.createAnalyser(); state.microphone=state.audioContext.createMediaStreamSource(stream); state.microphone.connect(state.analyser); state.analyser.fftSize=256; state.dataArray=new Uint8Array(state.analyser.frequencyBinCount); state.visualizerActive=true; drawVisualizer(); }catch(e){ console.error("Mic denied",e); } }
+    function drawVisualizer(){ if(!state.visualizerActive) return; requestAnimationFrame(drawVisualizer); if(state.analyser&&state.dataArray){ state.analyser.getByteFrequencyData(state.dataArray); const bars=document.querySelectorAll('.bar'); bars.forEach((bar,i)=>{ if(state.isAiSpeaking){ bar.style.height='5px'; return; } let v=state.dataArray[Math.floor((i/bars.length)*state.dataArray.length)]; bar.style.height=Math.max(5,(v/255)*150)+'px'; bar.style.backgroundColor=`rgb(255,${102+v/2},${204})`; }); } }
+    
+    // ========== CUSTOM COMMANDS ==========
+    function renderCustomCommandsUI() { let container = document.getElementById('custom-commands-list'); container.innerHTML = ''; state.customCommands.forEach((cmd, idx) => { let div = document.createElement('div'); div.className = "flex justify-between items-center bg-zinc-900 p-2 rounded-lg text-xs"; div.innerHTML = `<span><span class="text-pink-400">"${cmd.phrase}"</span> → ${cmd.action}</span><button onclick="deleteCustomCommand(${idx})" class="text-red-500">✖</button>`; container.appendChild(div); }); }
+    function addCustomCommand() { let phrase = document.getElementById('new-phrase').value.trim().toLowerCase(); let action = document.getElementById('new-action').value.trim(); if (!phrase || !action) return; state.customCommands.push({ phrase, action }); saveCustomCommands(); renderCustomCommandsUI(); document.getElementById('new-phrase').value = ''; document.getElementById('new-action').value = ''; logEvent(`Custom added: "${phrase}"`, "green-500"); }
+    function deleteCustomCommand(idx) { state.customCommands.splice(idx,1); saveCustomCommands(); renderCustomCommandsUI(); }
+    function processCustomCommands(text) { for (let cmd of state.customCommands) if (text.includes(cmd.phrase)) { executeCustomAction(cmd.action); return true; } return false; }
+    function executeCustomAction(action) { if (action.startsWith('pose ')) { let angles = action.substring(5).split(',').map(Number); if (angles.length===6) angles.forEach((a,i)=> setTargetAngle(i, a, true)); } else if (action.startsWith('slot ')) { let slotName = action.substring(5); let slot = state.slots.find(s => s.name === slotName); if (slot) executeSlot(slot.id); } else if (action.startsWith('led ')) setLED(action.substring(4), true); else logEvent(`Unknown: ${action}`, "red-500"); }
+    
+    // ========== RECORDING ==========
+    function startRecording(){ state.isRecording=true; state.recordedPoses=[]; let interval=parseFloat(document.getElementById('record-interval').value); state.recordInterval=interval; document.getElementById('recording-status').classList.remove('hidden'); document.getElementById('record-btn').innerHTML="⏹️ STOP RECORDING"; capturePoseForRecording(); state.recordTimer=setInterval(()=>capturePoseForRecording(),interval*1000); logEvent("Recording started","red-500"); }
+    function capturePoseForRecording(){ state.recordedPoses.push({angles:[...state.currentAngles],duration:state.recordInterval}); }
+    function stopRecording(){ clearInterval(state.recordTimer); state.isRecording=false; document.getElementById('recording-status').classList.add('hidden'); document.getElementById('record-btn').innerHTML="🔴 START RECORDING"; if(state.recordedPoses.length===0) return; let newId=Date.now(); let newSlot={id:newId,name:`REC_${newId}`,poses:state.recordedPoses,repeat:false}; state.slots.push(newSlot); updateSlotUI(); toggleEditor(newId); logEvent(`Recorded ${state.recordedPoses.length} poses`,"green-500"); state.recordedPoses=[]; }
+    function toggleRecording(){ if(state.isRecording) stopRecording(); else startRecording(); }
+    
+    // ========== SLOTS ==========
+    function updateSlotUI(){
+    let container=document.getElementById('slot-list');
+    container.innerHTML='';
+    state.slots.forEach(slot=>{
+        let div=document.createElement('div');
+        div.className="slot-card p-6 rounded-3xl";
+        div.innerHTML=`<div class="flex justify-between items-start"><div><h4 class="orbitron text-lg font-black">${slot.name}</h4><span class="mono text-xs">${slot.poses.length} pts</span></div><button onclick="deleteSlot(${slot.id})" class="text-zinc-500 hover:text-red-500">✖</button></div><div class="grid grid-cols-3 gap-2 mt-4"><button onclick="executeSlot(${slot.id})" class="bg-pink-600 py-2 rounded-xl text-xs">EXECUTE</button><button onclick="executeSlotSmooth(${slot.id}, 0.8)" class="bg-purple-600 py-2 rounded-xl text-xs">SMOOTH</button><button onclick="toggleEditor(${slot.id})" class="bg-zinc-800 py-2 rounded-xl text-xs">CONFIG</button></div>`;
+        container.appendChild(div);
+    });
+    document.getElementById('slot-usage').innerHTML=`${state.slots.length}/12`;
+}
+    function addNewSlot(speak=true){ if(state.slots.length>=12) return; let id=Date.now(); state.slots.push({id,name:`SEQ_${id}`,poses:[],repeat:false}); updateSlotUI(); toggleEditor(id); if(speak) speakReply("New slot added."); return "New slot."; }
+    function deleteSlot(id){ state.slots=state.slots.filter(s=>s.id!==id); updateSlotUI(); speakReply("Slot deleted."); }
+    async function executeSlot(id){
+    let slot=state.slots.find(s=>s.id===id);
+    if(!slot||!slot.poses.length) return;
+    state.isExecuting=true;
+    document.getElementById('exec-hud').style.display='flex';
+    let loops=slot.repeat?99:1;
+    for(let l=0;l<loops&&state.isExecuting;l++){
+        for(let i=0;i<slot.poses.length&&state.isExecuting;i++){
+            let p=slot.poses[i];
+            document.getElementById('hud-pose-idx').innerText=i+1;
+            document.getElementById('hud-progress').style.width=`${((i+1)/slot.poses.length)*100}%`;
+            for(let j=0;j<6;j++) setTargetAngle(j,p.angles[j],true);
+            await new Promise(r=>setTimeout(r,p.duration*1000));
+        }
+    }
+    abortAll();
+    state.analytics.sequenceRuns++;
+    saveAnalytics();
+    updateAnalyticsUI();
+    speakReply("Sequence finished.");
+}
+
+async function executeSlotSmooth(id, transitionTime = 1.0) {
+    let slot = state.slots.find(s => s.id === id);
+    if (!slot || !slot.poses.length) return;
+    
+    state.isExecuting = true;
+    document.getElementById('exec-hud').style.display = 'flex';
+    
+    let loops = slot.repeat ? 99 : 1;
+    let currentPoseIndex = 0;
+    let currentLoop = 0;
+    let animationId = null;
+    let startTime = null;
+    let currentTargetAngles = [...state.currentAngles];
+    let currentStartAngles = [...state.currentAngles];
+    
+    function animateMovement(timestamp) {
+        if (!state.isExecuting) return;
+        
+        if (!startTime) {
+            startTime = timestamp;
+            animationId = requestAnimationFrame(animateMovement);
+            return;
+        }
+        
+        let elapsed = timestamp - startTime;
+        let duration = transitionTime * 1000;
+        let t = Math.min(1, elapsed / duration);
+        
+        let eased = t < 0.5 
+            ? 4 * t * t * t 
+            : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        
+        for (let j = 0; j < 6; j++) {
+            let interpAngle = currentStartAngles[j] + (currentTargetAngles[j] - currentStartAngles[j]) * eased;
+            setTargetAngle(j, interpAngle, false);
+        }
+        
+        let overallProgress = ((currentPoseIndex + t) / slot.poses.length) * 100;
+        document.getElementById('hud-progress').style.width = `${Math.min(100, overallProgress)}%`;
+        document.getElementById('hud-pose-idx').innerText = currentPoseIndex + 1;
+        
+        if (t >= 1) {
+            currentStartAngles = [...currentTargetAngles];
+            currentPoseIndex++;
+            
+            if (currentPoseIndex >= slot.poses.length) {
+                currentLoop++;
+                if (currentLoop >= loops) {
+                    abortAll();
+                    state.analytics.sequenceRuns++;
+                    saveAnalytics();
+                    updateAnalyticsUI();
+                    speakReply("Smooth sequence finished.");
+                    return;
+                } else {
+                    currentPoseIndex = 0;
+                }
+            }
+            
+            let nextPose = slot.poses[currentPoseIndex];
+            currentTargetAngles = [...nextPose.angles];
+            
+            if (nextPose.duration > 0 && currentPoseIndex > 0) {
+                startTime = null;
+                setTimeout(() => {
+                    startTime = null;
+                    animationId = requestAnimationFrame(animateMovement);
+                }, nextPose.duration * 1000);
+                return;
+            }
+            
+            startTime = null;
+        }
+        
+        animationId = requestAnimationFrame(animateMovement);
+    }
+    
+    currentTargetAngles = [...slot.poses[0].angles];
+    startTime = null;
+    animationId = requestAnimationFrame(animateMovement);
+    state.currentAnimation = animationId;
+}
+    function abortAll(){
+    state.isExecuting=false;
+    document.getElementById('exec-hud').style.display='none';
+    if (state.currentAnimation) {
+        cancelAnimationFrame(state.currentAnimation);
+        state.currentAnimation = null;
+    }
+}
+    function toggleEditor(id){ state.activeEditorId=id; let slot=state.slots.find(s=>s.id===id); document.getElementById('edit-slot-name').value=slot.name; document.getElementById('captured-poses').innerHTML=''; slot.poses.forEach((p,i)=>addPoseRow(p,i)); document.getElementById('editor-panel').classList.add('active'); }
+    function captureCurrentPose(){ let dur=parseFloat(document.getElementById('pose-duration-range').value); let pose={angles:[...state.currentAngles],duration:dur}; let slot=state.slots.find(s=>s.id===state.activeEditorId); slot.poses.push(pose); addPoseRow(pose,slot.poses.length-1); speakReply("Pose captured."); }
+    function addPoseRow(pose,idx){ let wrapper=document.createElement('div'); wrapper.className='pose-row-wrapper'; let content=document.createElement('div'); content.className='pose-row-content'; content.innerHTML=`<div class="pose-drag-handle"><span></span><span></span><span></span></div><div class="pose-info"><div class="pose-header"><span class="pose-pt-label">POINT ${idx+1}</span><span class="pose-dur">${pose.duration}s</span></div><div class="pose-angles">${state.names.map((n,i)=>`${n}:${pose.angles[i]}°`).join(' ')}</div></div><button class="pose-delete-btn" data-idx="${idx}">✖</button>`; let delBtn=content.querySelector('.pose-delete-btn'); delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); let slot=state.slots.find(s=>s.id===state.activeEditorId); slot.poses.splice(idx,1); toggleEditor(state.activeEditorId); speakReply("Pose deleted."); }); content.onclick=(e)=>{ if(e.target===delBtn) return; pose.angles.forEach((a,i)=>setTargetAngle(i,a,true)); }; wrapper.appendChild(content); document.getElementById('captured-poses').appendChild(wrapper); }
+    function performCoreUpload(){ let slot=state.slots.find(s=>s.id===state.activeEditorId); slot.name=document.getElementById('edit-slot-name').value; slot.repeat=document.getElementById('repeat-check').checked; updateSlotUI(); closeEditor(); speakReply("Slot saved."); }
+    function closeEditor(){ document.getElementById('editor-panel').classList.remove('active'); }
+    
+    // ========== UTILITIES ==========
+    function logEvent(msg,color){ let con=document.getElementById('system-console'); con.innerHTML=`<div class="text-${color} text-xs">[${new Date().toLocaleTimeString()}] ${msg}</div>`+con.innerHTML; }
+    function toggleChat(){ let exp=document.getElementById('chat-expanded'); exp.style.display=exp.style.display==='flex'?'none':'flex'; }
+    function sendChat(){ let inp=document.getElementById('chat-input'); if(!inp.value.trim()) return; processCommand(inp.value.toLowerCase()); inp.value=''; }
+    function initDragChat(e){ let widget=document.getElementById('chat-widget'); let sX=e.clientX-widget.offsetLeft, sY=e.clientY-widget.offsetTop; function move(me){ widget.style.left=(me.clientX-sX)+'px'; widget.style.top=(me.clientY-sY)+'px'; widget.style.bottom=widget.style.right='auto'; } function stop(){ window.removeEventListener('mousemove',move); window.removeEventListener('mouseup',stop); } window.addEventListener('mousemove',move); window.addEventListener('mouseup',stop); setTimeout(()=>{ if(Math.abs(e.clientX-(widget.offsetLeft+sX))<5) toggleChat(); },120); }
+    function toggleOrbState(){ let orb=document.getElementById('sys-status-orb'); orb.classList.toggle('orb-green'); orb.classList.toggle('orb-red'); speakReply(orb.classList.contains('orb-green')?"Neural optimal.":"Warning: destabilized."); }
+    function toggleLimitsPanel(){ let p=document.getElementById('limits-panel'); p.style.display=p.style.display==='none'?'block':'none'; document.getElementById('limits-arrow').innerText=p.style.display==='none'?'▶':'▼'; }
+    function toggleVoiceTrainingPanel(){ let p=document.getElementById('voice-training-panel'); p.style.display=p.style.display==='none'?'block':'none'; document.getElementById('vt-arrow').innerText=p.style.display==='none'?'▶':'▼'; }
+    function toggleRecorderPanel(){ let p=document.getElementById('recorder-panel'); p.style.display=p.style.display==='none'?'block':'none'; document.getElementById('rec-arrow').innerText=p.style.display==='none'?'▶':'▼'; }
+    async function loadStoredData(){ try{ let data=await(await fetch('/get_slots')).json(); state.slots=data.slots||[]; updateSlotUI(); }catch(e){} }
+    async function initApp(){
+        init3D();
+        loadHomeAngles(); loadSyncFlags(); loadLimits(); loadCustomCommands(); loadAnalytics();
+        renderAllMotors();
+        await loadStoredData();
+        setupVoiceRecognition();
+        let wf=document.getElementById('waveform'); if(wf) for(let i=0;i<45;i++){ let bar=document.createElement('div'); bar.className='bar'; bar.style.height='10px'; wf.appendChild(bar); }
+        pidAnimationLoop();
+        initWebSocket();
+        logEvent("KYUN AI V11 - Editor/Viewer mode enabled, 3D only control added", "pink-500");
+        logEvent("All systems online. Only one editor at a time can control the hardware.", "green-500");
+        logEvent("Toggle '3D Only Mode' to edit the 3D model without moving the physical arm.", "yellow-500");
+    }
+    
+    window.initApp = initApp; window.setLED = setLED; window.resetAllServos = resetAllServos; window.saveHomeAngle = saveHomeAngle;
+    window.toggleSync = toggleSync; window.toggleSimulationMode = toggleSimulationMode; window.startVoiceAI = startVoiceAI;
+    window.stopVoiceAI = stopVoiceAI; window.toggleVoiceMinimize = toggleVoiceMinimize; window.undoSpeech = undoSpeech;
+    window.processFinalSpeech = processFinalSpeech; window.changeTone = changeTone; window.addNewSlot = addNewSlot;
+    window.deleteSlot = deleteSlot; window.executeSlot = executeSlot; window.toggleEditor = toggleEditor;
+    window.captureCurrentPose = captureCurrentPose; window.performCoreUpload = performCoreUpload; window.closeEditor = closeEditor;
+    window.abortAll = abortAll; window.toggleChat = toggleChat; window.sendChat = sendChat; window.initDragChat = initDragChat;
+    window.toggleOrbState = toggleOrbState; window.toggleLimitsPanel = toggleLimitsPanel; window.toggleVoiceTrainingPanel = toggleVoiceTrainingPanel;
+    window.toggleRecorderPanel = toggleRecorderPanel; window.saveLimitsToLocal = saveLimitsToLocal; window.addCustomCommand = addCustomCommand;
+    window.deleteCustomCommand = deleteCustomCommand; window.toggleRecording = toggleRecording; window.resetAnalytics = resetAnalytics;
+    window.executeSlotSmooth = executeSlotSmooth;
+    window.requestEditorRole = requestEditorRole;
+    window.releaseEditorRole = releaseEditorRole;
+    window.toggleHardwareControl = toggleHardwareControl;
+    window.sync3DToHardware = sync3DToHardware;
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Structure of Directory
+
+Reciever
+-app.py
+-database.json
+-Reciever.ino
+-templates
+	-index.html
