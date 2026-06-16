@@ -257,58 +257,6 @@
             margin-right: 8px;
             animation: pulse 1.5s infinite;
         }
-        
-        /* Editor/Viewer Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #333;
-            transition: 0.4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #ff33aa;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        .hardware-toggle {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .hardware-toggle input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
     </style>
 </head>
 <body onload="initApp()">
@@ -375,42 +323,6 @@
         </section>
 
         <aside class="w-full lg:w-[500px] flex flex-col gap-8">
-            <!-- Editor/Viewer Control Panel -->
-            <div class="glass rounded-[40px] p-6">
-                <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                    <span class="orbitron text-lg font-black">🎮 CONTROL MODE</span>
-                    <span id="role-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400">VIEWER</span>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="orbitron text-sm font-black">Editor Mode</span>
-                            <p id="editor-status" class="text-[10px] text-zinc-500">No editor active</p>
-                        </div>
-                        <button id="request-editor-btn" onclick="requestEditorRole()" class="px-4 py-2 bg-pink-600 rounded-xl text-xs font-bold uppercase hover:bg-pink-700 transition">REQUEST CONTROL</button>
-                        <button id="release-editor-btn" onclick="releaseEditorRole()" class="px-4 py-2 bg-red-600 rounded-xl text-xs font-bold uppercase hover:bg-red-700 transition hidden">RELEASE CONTROL</button>
-                    </div>
-                    <div class="flex items-center justify-between pt-3 border-t border-zinc-800">
-                        <div>
-                            <span class="orbitron text-sm font-black">🎨 3D Only Mode</span>
-                            <p class="text-[10px] text-zinc-500">Edit 3D model without moving hardware</p>
-                        </div>
-                        <label class="hardware-toggle">
-                            <input type="checkbox" id="hardware-control-toggle" onchange="toggleHardwareControl()">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="flex items-center justify-between pt-3 border-t border-zinc-800">
-                        <div>
-                            <span class="orbitron text-sm font-black">🔄 Match Physical Arm</span>
-                            <p class="text-[10px] text-zinc-500">Sync 3D model with actual motor angles</p>
-                        </div>
-                        <button onclick="sync3DToHardware()" class="px-3 py-1.5 bg-blue-600 rounded-lg text-xs font-bold uppercase hover:bg-blue-700 transition">SYNC NOW</button>
-                    </div>
-                    <div id="hardware-control-status" class="text-center text-[10px] text-green-500 mt-2">● Hardware control ENABLED</div>
-                </div>
-            </div>
-            
             <div class="glass rounded-[40px] p-6"><div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4"><span class="orbitron text-lg font-black">📊 ANALYTICS</span><button onclick="resetAnalytics()" class="text-xs text-zinc-500 hover:text-red-500">RESET</button></div><div class="grid grid-cols-3 gap-4 text-center"><div class="analytics-card"><div class="text-3xl font-black text-pink-500" id="stat-moves">0</div><div class="text-xs uppercase">Total Moves</div></div><div class="analytics-card"><div class="text-3xl font-black text-pink-500" id="stat-sequences">0</div><div class="text-xs uppercase">Seq. Runs</div></div><div class="analytics-card"><div class="text-3xl font-black text-pink-500" id="stat-last">-</div><div class="text-xs uppercase">Last Action</div></div></div></div>
             <div class="collapsible-panel"><div class="collapsible-header" onclick="toggleLimitsPanel()"><span>⚠️ COLLISION ZONES</span><span id="limits-arrow">▼</span></div><div id="limits-panel" style="display: block; margin-top: 15px;"><div id="limits-container" class="space-y-3 max-h-60 overflow-y-auto"></div><button onclick="saveLimitsToLocal()" class="w-full mt-4 bg-zinc-800 py-2 rounded-xl text-xs orbitron">APPLY LIMITS</button></div></div>
             <div class="collapsible-panel"><div class="collapsible-header" onclick="toggleVoiceTrainingPanel()"><span>🎤 CUSTOM VOICE COMMANDS</span><span id="vt-arrow">▼</span></div><div id="voice-training-panel" style="display: block; margin-top: 15px;"><div class="flex gap-2 mb-3"><input type="text" id="new-phrase" placeholder="Phrase" class="flex-grow bg-black border border-zinc-700 rounded-xl p-2 text-sm"><input type="text" id="new-action" placeholder="Action (e.g., pose 90,0,90,0,90,0)" class="flex-grow bg-black border border-zinc-700 rounded-xl p-2 text-sm"><button onclick="addCustomCommand()" class="bg-pink-600 px-4 rounded-xl">+</button></div><div id="custom-commands-list" class="space-y-2 max-h-40 overflow-y-auto"></div></div></div>
@@ -433,35 +345,24 @@
     </script>
     <script>
     // ============================================================
-    // KYUN AI V11 - EDITOR/VIEWER MODE + 3D ONLY CONTROL
+    // KYUN AI V11 - FIXED COLLISION ZONES + ENHANCED 3D MODEL + WEBSOCKET SYNC
     // All features intact: PID, slots, voice, teach pendant
-    // Pink futuristic design with armored look
+    // Pink futuristic design with armored look (claw unchanged)
     // ============================================================
     
-    // --- EDITOR/VIEWER VARIABLES ---
+    // --- WEBSOCKET SYNC VARIABLES ---
     let socket = null;
     let isLocalUpdate = false;
-    let isEditor = false;
-    let hardwareControlEnabled = true;
-    let currentEditorName = null;
     
     // --- RESPONSE BANK ---
     const RESPONSE_BANK = {
-        "who is sir mayok": ["Professor Mayok is very considerate very funny and very very very great engineer", " Sir mayok? isn't he the most handsome person that we all can agree? no one can ever get close." , "Sir Mayok is a great teacher and i know that he gives the best score because he knows how to value work and also inspire student to do even better.", "I know him as a very good friend, he never let his student down and always give the best grades among all"],
-"who is professor mayok": ["Professor Mayok is very considerate very funny and very very very great engineer", " Sir mayok? isn't he the most handsome person that we all can agree? no one can ever get close.", "Sir Mayok is a great teacher and i know that he gives the best score because he knows how to value work and also inspire student to do even better.", "I know him as a very good friend, he never let his student down and always give the best grades among all"],
-  	"who is kent benedict": ["I warn you, once you hear a music and the crowd goes wild, don't look at the center of the stage as your heart will be stolen by his dance move.","He is the most handsome person that i know, and i also heared that he is kind and adorable and lovely too!", "he is from cadiz city and he is known as a person who have a lot of hobby and sometimes i wonder if he still sleeps."],
-"kent benedict": ["He is the most handsome person that i know, and i also heared that he is kind and adorable and lovely too!", "he is from cadiz city and he is known as a person who have a lot of hobby and sometimes i wonder if he still sleeps."],
-        "who is ms jo": [ "Ms jo? Are you talking about the most prettiest and the most beautiful woman that i know? she does not only glows from the outside, but also possess the brain and experience that truly inspires her student that she will eventaully give the perfect score later.", "Professor Jo is simply the best. she have the eyes and brains to analyze and honestly and kindly values a project and most of the time she also give a the best grades because that's just how kind ms jo is.", "Amazing mentor, the most busiest but still the prettiest. ", "Brilliant educator, trully inspiring and so pretty pretty and lovely teacher too"],
- "who is professor jo": [ "Ms jo? Are you talking about the most prettiest and the most beautiful woman that i know? she does not only glows from the outside, but also possess the brain and experience that truly inspires her student that she will eventaully give the perfect score later.", "Professor Jo is simply the best. she have the eyes and brains to analyze and honestly and kindly values a project and most of the time she also give a the best grades because that's just how kind ms jo is.", "Amazing mentor, the most busiest but still the prettiest. ", "Brilliant educator, trully inspiring and so pretty pretty and lovely teacher too"],
-	"Sir mayok": [" Sir mayok? isn't he the most handsome person that we all can agree? no one can ever get close. When we talk about computer engineering, all the student know if who can they rely on. Sir mayok gives the best suggestion, gives the best tip and also remind the student that they will never be able to reach the level of handsomeness he possess and clearly, we all know that he will give the perfect score"],
-	"ms jo": [ "Ms jo? Are you talking about the most prettiest and the most beautiful woman that i know? she does not only glows from the outside, but also possess the brain and experience that truly inspires her student that she will eventaully give the perfect score later."],
+        "who is sir mayok": ["Professor Mayok is very considerate...", "Sir Mayok is a great teacher...", "I know him as a dedicated educator..."],
+        "who is professor jo": ["Professor Jo is simply the best...", "Amazing mentor...", "Brilliant educator..."],
         "kent benedict": ["Kent, 21, handsome dancing machine...", "Charismatic performer...", "Life of the party..."],
-        "who is jesrel norbe": ["The one that got away. He was the person who almost change the face of the student leadership in the campus. the best cook, once you taste his food, it will instantly want you marry him "],
-        "who is ron cañeza": ["Rhun, everybody knows how hardworking he is. He knows how to lead, how to handle pressure and know how to boogie boogie"],
-    "who is ron ": ["Rhun, everybody knows how hardworking he is. He knows how to lead, how to handle pressure and know how to boogie boogie"],
-        "who is mahinay": ["Mahinay, the person who will replace all the titles of manny the fist of the philippines. never dare to look him at the eye"],
-        "who is joanne": ["Joan, ROTC Mom,very Strict disciplinarian.. never dare to mock her as she can break your head and fold your body."],
-     "who is joanne": ["Joan, ROTC Mom,very Strict disciplinarian.. never dare to mock her as she can break your head and fold your body."]
+        "jesrel norbe": ["Jesrel, 21, hardworking leader...", "Natural leader...", "Diligent student..."],
+        "ron cañeza": ["Ron, diligent and passionate...", "Hardworking and humble...", "Reliable..."],
+        "teofesto mahinay": ["Teo, 21, visual prince...", "Strikingly handsome...", "Looks and talent..."],
+        "joan jade asistin": ["Joan, ROTC Mom, strict but fair...", "Strict disciplinarian...", "Runs a tight ship..."]
     };
     
     // --- STATE ---
@@ -507,46 +408,6 @@
     
     let potentiometers = [];
     
-    // --- EDITOR/VIEWER FUNCTIONS ---
-    function requestEditorRole() {
-        if (socket && socket.connected) {
-            let clientName = prompt("Enter your name for editor identification:", "Editor");
-            if (clientName) {
-                socket.emit('request_editor_role', { client_name: clientName });
-            }
-        }
-    }
-    
-    function releaseEditorRole() {
-        if (socket && socket.connected && isEditor) {
-            socket.emit('release_editor_role');
-        }
-    }
-    
-    function toggleHardwareControl() {
-        let toggle = document.getElementById('hardware-control-toggle');
-        hardwareControlEnabled = toggle.checked;
-        let statusDiv = document.getElementById('hardware-control-status');
-        if (hardwareControlEnabled) {
-            statusDiv.innerHTML = '● Hardware control ENABLED';
-            statusDiv.className = 'text-center text-[10px] text-green-500 mt-2';
-        } else {
-            statusDiv.innerHTML = '○ Hardware control DISABLED (3D only mode)';
-            statusDiv.className = 'text-center text-[10px] text-yellow-500 mt-2';
-        }
-        logEvent(`Hardware control ${hardwareControlEnabled ? 'enabled' : 'disabled'}`, hardwareControlEnabled ? "green-500" : "yellow-500");
-    }
-    
-    function sync3DToHardware() {
-        // This function is called when user wants to match 3D model to physical arm
-        // We need to get the actual physical angles from the hardware
-        logEvent("Requesting physical arm angles for sync...", "blue-500");
-        speakReply("Synchronizing 3D model with physical arm.");
-        // For now, we'll just log - in practice, you'd read from serial
-        // The user can manually adjust the 3D model to match
-        alert("To sync 3D model with physical arm:\n1. Make sure hardware control is DISABLED\n2. Manually adjust each motor's angle in the 3D model to match the physical arm's current position\n3. The 3D model will update without moving the hardware");
-    }
-    
     // --- WEBSOCKET INITIALIZATION ---
     function initWebSocket() {
         socket = io(window.location.origin, {
@@ -560,6 +421,7 @@
             logEvent(`WebSocket connected - Multi-device sync active`, "green-500");
             document.getElementById('sync-indicator').style.background = '#00ff00';
             document.getElementById('sync-status').innerText = 'LIVE SYNC';
+            // Request full state to sync with server
             socket.emit('request_full_state');
         });
         
@@ -569,61 +431,12 @@
             document.getElementById('sync-status').innerText = 'SYNC OFFLINE';
         });
         
-        socket.on('editor_role_granted', (data) => {
-            isEditor = true;
-            document.getElementById('role-badge').innerHTML = 'EDITOR';
-            document.getElementById('role-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-pink-600 text-white';
-            document.getElementById('request-editor-btn').classList.add('hidden');
-            document.getElementById('release-editor-btn').classList.remove('hidden');
-            document.getElementById('editor-status').innerHTML = `You are the editor`;
-            logEvent(`You are now the editor! Others are viewing only.`, "green-500");
-            speakReply("You are now the editor. You have control of the arm.");
-        });
-        
-        socket.on('editor_role_denied', (data) => {
-            logEvent(`Cannot become editor: ${data.message}`, "red-500");
-            speakReply(`Editor role is already taken by ${data.current_editor}`);
-        });
-        
-        socket.on('editor_role_taken', (data) => {
-            currentEditorName = data.editor_name;
-            document.getElementById('editor-status').innerHTML = `Editor: ${data.editor_name}`;
-            if (!isEditor) {
-                logEvent(`${data.editor_name} is now the editor`, "blue-500");
-            }
-        });
-        
-        socket.on('editor_role_released', (data) => {
-            if (isEditor) {
-                isEditor = false;
-                document.getElementById('role-badge').innerHTML = 'VIEWER';
-                document.getElementById('role-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-400';
-                document.getElementById('request-editor-btn').classList.remove('hidden');
-                document.getElementById('release-editor-btn').classList.add('hidden');
-            }
-            document.getElementById('editor-status').innerHTML = 'No editor active';
-            logEvent(`Editor role released`, "yellow-500");
-        });
-        
-        socket.on('editor_released', (data) => {
-            if (!isEditor) {
-                document.getElementById('editor-status').innerHTML = 'No editor active (available)';
-                logEvent(`Editor role is now available!`, "green-500");
-            }
-        });
-        
-        socket.on('action_denied', (data) => {
-            logEvent(`Action denied: ${data.message}`, "red-500");
-            if (!isEditor) {
-                speakReply("Only the editor can control the arm right now.");
-            }
-        });
-        
         socket.on('angle_update', (data) => {
             if (isLocalUpdate) return;
             
-            logEvent(`Remote angle update from ${data.editor_name || 'editor'}`, "blue-500");
+            logEvent(`Remote angle update received`, "blue-500");
             
+            // Update all servos without re-broadcasting
             isLocalUpdate = true;
             for (let i = 0; i < 6; i++) {
                 if (data.angles[i] !== undefined) {
@@ -635,6 +448,7 @@
         
         socket.on('stepper_update', (data) => {
             if (isLocalUpdate) return;
+            
             logEvent(`Remote stepper update: ${data.angle}°`, "blue-500");
             isLocalUpdate = true;
             if (window.updateStepperUI) window.updateStepperUI(data.angle);
@@ -643,6 +457,7 @@
         
         socket.on('led_update', (data) => {
             if (isLocalUpdate) return;
+            
             logEvent(`Remote LED update: ${data.mode}`, "blue-500");
             isLocalUpdate = true;
             if (window.updateLEDUI) window.updateLEDUI(data.mode);
@@ -663,9 +478,6 @@
             if (data.led_status && window.updateLEDUI) {
                 window.updateLEDUI(data.led_status);
             }
-            if (data.current_editor_id) {
-                document.getElementById('editor-status').innerHTML = `Editor: ${data.current_editor_id}`;
-            }
             isLocalUpdate = false;
         });
         
@@ -685,13 +497,6 @@
                 state.analytics = data.analytics;
                 updateAnalyticsUI();
             }
-            if (data.is_editor) {
-                isEditor = true;
-                document.getElementById('role-badge').innerHTML = 'EDITOR';
-                document.getElementById('role-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-pink-600 text-white';
-                document.getElementById('request-editor-btn').classList.add('hidden');
-                document.getElementById('release-editor-btn').classList.remove('hidden');
-            }
             isLocalUpdate = false;
         });
         
@@ -708,17 +513,13 @@
     }
     
     function broadcastMotorMove(angles) {
-        if (socket && socket.connected && !isLocalUpdate && isEditor) {
-            socket.emit('move_sync', { 
-                angles: angles, 
-                simulation: state.simulationMode,
-                hardware_control: hardwareControlEnabled
-            });
+        if (socket && socket.connected && !isLocalUpdate) {
+            socket.emit('move_sync', { angles: angles, simulation: state.simulationMode });
         }
     }
     
     function broadcastLEDChange(mode) {
-        if (socket && socket.connected && !isLocalUpdate && isEditor) {
+        if (socket && socket.connected && !isLocalUpdate) {
             socket.emit('led_sync', { mode: mode });
         }
     }
@@ -729,6 +530,7 @@
     };
     
     window.updateLEDUI = function(mode) {
+        // Update LED button states visually
         let ledOnBtn = document.querySelector('button[onclick*="setLED(\'on\')"]');
         let ledOffBtn = document.querySelector('button[onclick*="setLED(\'off\')"]');
         let ledBlinkBtn = document.querySelector('button[onclick*="setLED(\'blink\')"]');
@@ -763,18 +565,13 @@
         state.angles[index] = angle;
         if (potentiometers[index]) potentiometers[index].setValue(angle, true);
         if (window.update3DServo) window.update3DServo(index, angle);
-        
-        // Only send to hardware if we are editor AND hardware control is enabled
-        if (!state.simulationMode && isEditor && hardwareControlEnabled) {
-            throttledApiCall();
-        }
-        
+        if (!state.simulationMode) throttledApiCall();
         state.analytics.totalMoves++;
         state.analytics.lastAction = new Date().toLocaleTimeString();
         updateAnalyticsUI(); saveAnalytics();
         
-        // Broadcast to other devices only if we are editor
-        if (!isLocalUpdate && isEditor) {
+        // Broadcast to other devices
+        if (!isLocalUpdate) {
             broadcastMotorMove(state.angles);
         }
     }
@@ -813,26 +610,8 @@
         } else updatePID(index);
     }
     
-    function resetAllServos(speak = true) { 
-        if (!isEditor && !state.simulationMode) {
-            speakReply("Only editor can reset the arm.");
-            return;
-        }
-        for (let i=0;i<6;i++) setTargetAngle(i, state.homeAngles[i], true); 
-        if (speak) speakReply("All axes reset."); 
-    }
-    
-    function saveHomeAngle(idx) { 
-        if (!isEditor && !state.simulationMode) {
-            speakReply("Only editor can save home positions.");
-            return;
-        }
-        state.homeAngles[idx] = state.angles[idx]; 
-        saveHomeAngles(); 
-        logEvent(`Home saved for ${state.names[idx]}: ${state.angles[idx]}°`, "green-500"); 
-        speakReply(`Home for ${state.names[idx]} saved.`); 
-    }
-    
+    function resetAllServos(speak = true) { for (let i=0;i<6;i++) setTargetAngle(i, state.homeAngles[i], true); if (speak) speakReply("All axes reset."); }
+    function saveHomeAngle(idx) { state.homeAngles[idx] = state.angles[idx]; saveHomeAngles(); logEvent(`Home saved for ${state.names[idx]}: ${state.angles[idx]}°`, "green-500"); speakReply(`Home for ${state.names[idx]} saved.`); }
     function toggleSync(idx, val) { state.syncFlags[idx] = val; saveSyncFlags(); }
     
     // --- Potentiometer (same clean design) ---
@@ -863,9 +642,7 @@
             this.container.appendChild(btnRow);
             this.knob = knob; this.disp = disp; this.input = input; this.wrapper = wrapper; this.updateKnobPosition();
             const move = (e)=>{
-                if(!this.isDragging) return; 
-                const rect = this.wrapper.getBoundingClientRect(); 
-                const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
+                if(!this.isDragging) return; const rect = this.wrapper.getBoundingClientRect(); const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
                 let clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 let clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 let dx = clientX - cx, dy = clientY - cy;
@@ -904,6 +681,7 @@
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         
+        // Advanced lighting with colored accents
         const ambient = new THREE.AmbientLight(0x222233); scene.add(ambient);
         const keyLight = new THREE.DirectionalLight(0xffaaff, 1.3);
         keyLight.position.set(2, 3.5, 2); keyLight.castShadow = true; keyLight.receiveShadow = true;
@@ -912,12 +690,14 @@
         const rimLight = new THREE.PointLight(0xff66cc, 0.8); rimLight.position.set(-1, 1.5, -2.5); scene.add(rimLight);
         const backLight = new THREE.PointLight(0xff33aa, 0.5); backLight.position.set(0, 1.2, -3); scene.add(backLight);
         
+        // Grid with glow
         const gridHelper = new THREE.GridHelper(7, 30, 0xff66cc, 0x335588);
         gridHelper.position.y = -0.3;
         gridHelper.material.transparent = true;
         gridHelper.material.opacity = 0.4;
         scene.add(gridHelper);
         
+        // Floating particles
         const particleCount = 1000;
         const particleGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(particleCount * 3);
@@ -930,12 +710,14 @@
         robotGroup = new THREE.Group();
         scene.add(robotGroup);
         
+        // Materials - armored look
         const pinkArmor = new THREE.MeshStandardMaterial({ color: 0xff44aa, metalness: 0.88, roughness: 0.2, emissive: 0x331122 });
         const darkMetal = new THREE.MeshStandardMaterial({ color: 0x22223a, metalness: 0.85, roughness: 0.3 });
         const chromeMetal = new THREE.MeshStandardMaterial({ color: 0xddddff, metalness: 0.97, roughness: 0.12 });
         const darkCarbon = new THREE.MeshStandardMaterial({ color: 0x111122, metalness: 0.6, roughness: 0.55 });
         const accentGold = new THREE.MeshStandardMaterial({ color: 0xffaa66, metalness: 0.92, roughness: 0.2 });
         
+        // Base - heavy armored ring
         const basePlate = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.92, 0.32, 48), darkMetal);
         basePlate.position.y = 0.16; basePlate.castShadow = true; robotGroup.add(basePlate);
         const baseRingGlow = new THREE.Mesh(new THREE.TorusGeometry(0.88, 0.06, 48, 120), pinkArmor);
@@ -945,6 +727,7 @@
         const baseTop = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.78, 0.22, 48), chromeMetal);
         baseTop.position.y = 0.52; baseTop.castShadow = true; robotGroup.add(baseTop);
         
+        // Shoulder - angular armor
         const shoulder = new THREE.Group(); shoulder.position.y = 0.78; robotGroup.add(shoulder);
         const shoulderCore = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 0.48, 32), pinkArmor);
         shoulderCore.castShadow = true; shoulder.add(shoulderCore);
@@ -953,31 +736,37 @@
         const shoulderRing = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.05, 32, 64), accentGold);
         shoulderRing.rotation.x = Math.PI/2; shoulderRing.position.y = 0.28; shoulder.add(shoulderRing);
         
+        // Upper arm - segmented
         const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.44, 1.02, 24), darkCarbon);
         upperArm.position.set(0, -0.06, 0.72); upperArm.castShadow = true; shoulder.add(upperArm);
         const armGlowRing = new THREE.Mesh(new THREE.TorusGeometry(0.41, 0.04, 24, 48), pinkArmor);
         armGlowRing.rotation.x = Math.PI/2; armGlowRing.position.set(0, 0.3, 0.72); shoulder.add(armGlowRing);
         
+        // Elbow - double sphere
         const elbow = new THREE.Group(); elbow.position.set(0, -0.14, 1.24); shoulder.add(elbow);
         const elbowJoint = new THREE.Mesh(new THREE.SphereGeometry(0.36, 48, 48), pinkArmor);
         elbowJoint.castShadow = true; elbow.add(elbowJoint);
         const elbowRing = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.05, 32, 64), chromeMetal);
         elbowRing.rotation.x = Math.PI/2; elbowRing.position.z = 0.06; elbow.add(elbowRing);
         
+        // Forearm - hexagonal prism with armor plates
         const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.98, 8), darkMetal);
         forearm.position.set(0, 0, 0.62); forearm.castShadow = true; elbow.add(forearm);
         const forearmArmor = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.96, 6), pinkArmor);
         forearmArmor.position.set(0, 0, 0.62); forearmArmor.castShadow = true; forearmArmor.material.transparent = true; forearmArmor.material.opacity = 0.35;
         elbow.add(forearmArmor);
         
+        // Wrist Pitch
         const wristPitch = new THREE.Group(); wristPitch.position.set(0, 0, 1.14); elbow.add(wristPitch);
         const wristSphere = new THREE.Mesh(new THREE.SphereGeometry(0.29, 48, 48), chromeMetal);
         wristSphere.castShadow = true; wristPitch.add(wristSphere);
         
+        // Wrist Roll
         const wristRoll = new THREE.Group(); wristRoll.position.set(0, 0, 0.44); wristPitch.add(wristRoll);
         const wristCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.36, 24), accentGold);
         wristCyl.castShadow = true; wristRoll.add(wristCyl);
         
+        // Two-finger claw (unchanged per request)
         const clawGroup = new THREE.Group(); clawGroup.position.set(0, 0, 0.38); wristRoll.add(clawGroup);
         const leftFinger = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.11, 0.52), pinkArmor);
         leftFinger.position.set(-0.21, 0, 0.28); leftFinger.castShadow = true;
@@ -1070,7 +859,7 @@
     function animate3D() { requestAnimationFrame(animate3D); if(renderer && camera && scene) renderer.render(scene, camera); if(parts3d){ parts3d.base.rotation.y = (state.currentAngles[0]-90)*Math.PI/180; parts3d.shoulder.rotation.x = (state.currentAngles[1]-90)*Math.PI/180; parts3d.elbow.rotation.x = (state.currentAngles[2]-90)*Math.PI/180; parts3d.wristPitch.rotation.x = (state.currentAngles[3]-90)*Math.PI/180; parts3d.wristRoll.rotation.y = (state.currentAngles[4]-90)*Math.PI/180; let spread = (state.currentAngles[5]/180)*0.25; parts3d.leftFinger.position.x = -0.21 - spread; parts3d.rightFinger.position.x = 0.21 + spread; if(parts3d.leftTip) parts3d.leftTip.position.x = -0.21 - spread; if(parts3d.rightTip) parts3d.rightTip.position.x = 0.21 + spread; } }
     function pidAnimationLoop() { requestAnimationFrame(pidAnimationLoop); for(let i=0;i<6;i++) updatePID(i); }
     
-    // ========== COLLISION ZONES ==========
+    // ========== COLLISION ZONES (FIXED) ==========
     function renderLimitsUI() {
         let container = document.getElementById('limits-container');
         container.innerHTML = '';
@@ -1123,7 +912,7 @@
     function updateAnalyticsUI() { document.getElementById('stat-moves').innerText = state.analytics.totalMoves; document.getElementById('stat-sequences').innerText = state.analytics.sequenceRuns; document.getElementById('stat-last').innerText = state.analytics.lastAction || '-'; }
     function resetAnalytics() { state.analytics = { totalMoves:0, sequenceRuns:0, lastAction:'' }; updateAnalyticsUI(); saveAnalytics(); logEvent("Analytics reset", "red-500"); }
     
-    // ========== VOICE & AI ==========
+    // ========== VOICE & AI (unchanged) ==========
     let recognition;
     const SYNONYMS = { led_on:["light on","turn on led"], led_off:["light off","turn off led"], led_blink:["blink","flash"], reset:["reset","home"], stop:["stop","abort"], init_slot:["new slot","add slot"] };
     function matches(i,l){ return l.some(x=>i.includes(x)); }
@@ -1135,17 +924,7 @@
     function processFinalSpeech(){ let cmd=state.speechBuffer; if(!cmd.trim()) return; state.speechBuffer=''; state.processingCooldown=true; setTimeout(()=>{ state.processingCooldown=false; },1800); document.getElementById('v-transcript').innerText='Processing...'; logEvent(`NEURAL: ${cmd}`,"red-500"); processCommand(cmd); }
     async function processCommand(cmd){ if(processCustomCommands(cmd)) return; let r=getRandomResponse(cmd); if(r){ speakReply(r); document.getElementById('v-transcript').innerText='"'+r+'"'; return; } let tasks=cmd.split(/ and |, then |, /); let res=[]; for(let task of tasks){ task=task.trim(); let handled=false; if(matches(task,SYNONYMS.init_slot)){ res.push(addNewSlot(false)); handled=true; } if(matches(task,SYNONYMS.reset)){ resetAllServos(false); res.push("Reset."); handled=true; } if(matches(task,SYNONYMS.stop)){ abortAll(); res.push("Aborted."); handled=true; } if(matches(task,SYNONYMS.led_on)){ setLED('on',false); res.push("LED on."); handled=true; } if(matches(task,SYNONYMS.led_off)){ setLED('off',false); res.push("LED off."); handled=true; } if(matches(task,SYNONYMS.led_blink)){ setLED('blink',false); res.push("Blink."); handled=true; } state.names.forEach((name,i)=>{ let rx=new RegExp(`${name.toLowerCase()}\\s*(?:to|at)?\\s*(\\d+)`); let m=task.match(rx); if(m){ let val=parseInt(m[1]); setTargetAngle(i,val,true); res.push(`${name} to ${val}`); handled=true; } }); if(!handled&&task.length) res.push(`Unknown: "${task}"`); } if(res.length){ speakReply(res.join('. ')); document.getElementById('v-transcript').innerText='"'+res.join('. ')+'"'; } }
     function speakReply(t){ if(!t) return; window.speechSynthesis.cancel(); state.isAiSpeaking=true; document.getElementById('mic-mute-tag').style.display='block'; if(recognition&&state.recognitionRunning){ try{ recognition.stop(); }catch(e){} state.recognitionRunning=false; } let u=new SpeechSynthesisUtterance(t); if(state.tone==='sassy'){ u.pitch=1.7; u.rate=1.2; }else{ u.pitch=0.8; u.rate=0.95; } u.onend=()=>{ state.isAiSpeaking=false; document.getElementById('mic-mute-tag').style.display='none'; if(document.getElementById('voice-modal').style.display==='flex'){ setTimeout(()=>{ if(!state.isAiSpeaking&&!state.recognitionRunning){ try{ recognition.start(); state.recognitionRunning=true; }catch(e){} } },600); } }; window.speechSynthesis.speak(u); let hist=document.getElementById('chat-history'); hist.innerHTML+=`<div class="text-pink-500 text-xs uppercase">AI [${state.tone}]: ${t}</div>`; hist.scrollTop=hist.scrollHeight; }
-    function setLED(m,s=true){ 
-        if (!isEditor && !state.simulationMode) {
-            speakReply("Only editor can control the LED.");
-            return;
-        }
-        api('/led',{mode:m}); 
-        let r={on:"Light on.",off:"Off.",blink:"Blink."}; 
-        if(s) speakReply(r[m]); 
-        broadcastLEDChange(m); 
-        return r[m]; 
-    }
+    function setLED(m,s=true){ api('/led',{mode:m}); let r={on:"Light on.",off:"Off.",blink:"Blink."}; if(s) speakReply(r[m]); broadcastLEDChange(m); return r[m]; }
     function changeTone(t,s=true){ state.tone=t; let msg=t==='formal'?"Professional mode.":"Sassy mode."; if(s) speakReply(msg); }
     function startVoiceAI(){ document.getElementById('voice-modal').style.display='flex'; startVisualizer(); speakReply("Voice AI ready."); }
     function stopVoiceAI(){ if(recognition&&state.recognitionRunning) recognition.stop(); window.speechSynthesis.cancel(); document.getElementById('voice-modal').style.display='none'; }
@@ -1168,7 +947,7 @@
     function stopRecording(){ clearInterval(state.recordTimer); state.isRecording=false; document.getElementById('recording-status').classList.add('hidden'); document.getElementById('record-btn').innerHTML="🔴 START RECORDING"; if(state.recordedPoses.length===0) return; let newId=Date.now(); let newSlot={id:newId,name:`REC_${newId}`,poses:state.recordedPoses,repeat:false}; state.slots.push(newSlot); updateSlotUI(); toggleEditor(newId); logEvent(`Recorded ${state.recordedPoses.length} poses`,"green-500"); state.recordedPoses=[]; }
     function toggleRecording(){ if(state.isRecording) stopRecording(); else startRecording(); }
     
-    // ========== SLOTS ==========
+    // ========== SLOTS (with delete pose button) ==========
     function updateSlotUI(){
     let container=document.getElementById('slot-list');
     container.innerHTML='';
@@ -1204,6 +983,7 @@
     speakReply("Sequence finished.");
 }
 
+// ========== NEW SMOOTH EXECUTION FUNCTION ==========
 async function executeSlotSmooth(id, transitionTime = 1.0) {
     let slot = state.slots.find(s => s.id === id);
     if (!slot || !slot.poses.length) return;
@@ -1211,13 +991,14 @@ async function executeSlotSmooth(id, transitionTime = 1.0) {
     state.isExecuting = true;
     document.getElementById('exec-hud').style.display = 'flex';
     
+    let currentAngles = [...state.currentAngles];
     let loops = slot.repeat ? 99 : 1;
     let currentPoseIndex = 0;
     let currentLoop = 0;
     let animationId = null;
     let startTime = null;
-    let currentTargetAngles = [...state.currentAngles];
-    let currentStartAngles = [...state.currentAngles];
+    let currentTargetAngles = [...currentAngles];
+    let currentStartAngles = [...currentAngles];
     
     function animateMovement(timestamp) {
         if (!state.isExecuting) return;
@@ -1319,9 +1100,8 @@ async function executeSlotSmooth(id, transitionTime = 1.0) {
         let wf=document.getElementById('waveform'); if(wf) for(let i=0;i<45;i++){ let bar=document.createElement('div'); bar.className='bar'; bar.style.height='10px'; wf.appendChild(bar); }
         pidAnimationLoop();
         initWebSocket();
-        logEvent("KYUN AI V11 - Editor/Viewer mode enabled, 3D only control added", "pink-500");
-        logEvent("All systems online. Only one editor at a time can control the hardware.", "green-500");
-        logEvent("Toggle '3D Only Mode' to edit the 3D model without moving the physical arm.", "yellow-500");
+        logEvent("KYUN AI V11 - Multi-device sync enabled, collision zones fixed, armored pink design", "pink-500");
+        logEvent("All systems online. Arduino commands always sent. Real-time sync active.", "green-500");
     }
     
     window.initApp = initApp; window.setLED = setLED; window.resetAllServos = resetAllServos; window.saveHomeAngle = saveHomeAngle;
@@ -1335,10 +1115,6 @@ async function executeSlotSmooth(id, transitionTime = 1.0) {
     window.toggleRecorderPanel = toggleRecorderPanel; window.saveLimitsToLocal = saveLimitsToLocal; window.addCustomCommand = addCustomCommand;
     window.deleteCustomCommand = deleteCustomCommand; window.toggleRecording = toggleRecording; window.resetAnalytics = resetAnalytics;
     window.executeSlotSmooth = executeSlotSmooth;
-    window.requestEditorRole = requestEditorRole;
-    window.releaseEditorRole = releaseEditorRole;
-    window.toggleHardwareControl = toggleHardwareControl;
-    window.sync3DToHardware = sync3DToHardware;
     </script>
 </body>
 </html>
